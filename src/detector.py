@@ -1,4 +1,6 @@
 from typing import List
+import numpy as np
+from sklearn.ensemble import IsolationForest
 from .models import Transaction, FraudResult
 
 class Rule:
@@ -31,11 +33,63 @@ class LocationAnomalyRule(Rule):
             return 0.8
         return 0.0
 
+class MLAnomalyRule(Rule):
+    """ML-based anomaly detection using Isolation Forest"""
+    def __init__(self):
+        super().__init__("ML Anomaly", "Machine learning detected unusual pattern")
+        self.model = IsolationForest(contamination=0.1, random_state=42)
+        self.is_trained = False
+        
+    def evaluate(self, transaction: Transaction, history: List[Transaction]) -> float:
+        # Need at least 50 transactions to train
+        if len(history) < 50:
+            return 0.0
+            
+        # Extract features from history
+        features = self._extract_features(history + [transaction])
+        
+        # Train model if not already trained, or retrain periodically
+        if not self.is_trained or len(history) % 100 == 0:
+            self.model.fit(features[:-1])  # Train on history
+            self.is_trained = True
+        
+        # Predict on current transaction
+        current_features = features[-1:]
+        prediction = self.model.predict(current_features)
+        score = self.model.score_samples(current_features)
+        
+        # prediction == -1 means anomaly
+        if prediction[0] == -1:
+            # Normalize score to 0-1 range
+            normalized_score = min(abs(score[0]) / 2, 1.0)
+            return normalized_score
+        return 0.0
+    
+    def _extract_features(self, transactions: List[Transaction]) -> np.ndarray:
+        """Extract numerical features from transactions"""
+        features = []
+        location_map = {}  # Simple encoding for location
+        
+        for tx in transactions:
+            # Get or create location encoding
+            if tx.location not in location_map:
+                location_map[tx.location] = len(location_map)
+            
+            features.append([
+                tx.amount,
+                location_map[tx.location],
+                hash(tx.device_id) % 1000,  # Simple hash for device
+                hash(tx.ip_address) % 1000   # Simple hash for IP
+            ])
+        
+        return np.array(features)
+
 class FraudDetector:
     def __init__(self):
         self.rules = [
             HighAmountRule("High Value", "Transaction amount exceeds threshold"),
-            LocationAnomalyRule("Location Jump", "User location changed rapidly")
+            LocationAnomalyRule("Location Jump", "User location changed rapidly"),
+            MLAnomalyRule()
         ]
         self.history: List[Transaction] = []
 
