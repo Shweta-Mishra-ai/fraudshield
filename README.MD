@@ -4,6 +4,8 @@
 
 A production-ready, modular real-time fraud detection system built for the Pathway Hackathon. This project demonstrates high-throughput transaction monitoring, rule-based fraud detection, and interactive visual analytics.
 
+![Dashboard Screenshot](assets/dashboard_screenshot.png)
+
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -25,6 +27,19 @@ A production-ready, modular real-time fraud detection system built for the Pathw
 
 ---
 
+## 🔍 Live Demo Output
+
+Since live execution requires a Python environment, we have provided a captured log of the system's output showing real fraud detection logic in action.
+
+👉 **[View Real Demo Logs](./DEMO_OUTPUT.md)**
+
+This log demonstrates:
+*   Safe transactions passing through the filter.
+*   High-risk fraud detection with specific reasons (e.g., "High Value", "Location Jump").
+*   Scoring mechanism results.
+
+---
+
 ## 🏗️ Project Structure
 
 ```bash
@@ -33,7 +48,10 @@ A production-ready, modular real-time fraud detection system built for the Pathw
 │   ├── generator.py   # Synthetic transaction stream generator
 │   ├── models.py      # Data classes (Transaction, FraudResult)
 │   └── storage.py     # SQLite persistence layer
+├── assets/            # Project assets and screenshots
 ├── app.py             # Main Streamlit dashboard application
+├── generate_demo_output.py # Script to generate static demo logs
+├── models.py          # Data models
 ├── requirements.txt   # Python dependencies
 └── README.md          # Project documentation
 ```
