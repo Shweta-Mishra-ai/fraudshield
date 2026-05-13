@@ -72,7 +72,7 @@ This log demonstrates:
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/Shwetam77777/realtime-fraud-pathway.git
+    git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway
     cd realtime-fraud-pathway
     ```
 
@@ -126,4 +126,4 @@ This log demonstrates:
 ---
 
 
-Built with ❤️ by [Shweta Mishra](https://github.com/Shwetam77777)
+Built with ❤️ by [Shweta Mishra](https://github.com/Shweta-Mishra-ai)
