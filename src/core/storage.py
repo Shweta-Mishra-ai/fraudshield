@@ -226,6 +226,24 @@ class FraudStorage:
             """, (user_id, limit)).fetchall()
         return [self._row_to_dict(r) for r in rows]
 
+    def get_all_transactions(self) -> List[Transaction]:
+        """Fetch all historical transactions from database for state hydration."""
+        with self._conn() as conn:
+            rows = conn.execute("""
+                SELECT id, user_id, amount, currency, location, merchant_id,
+                       merchant_category, device_id, ip_address, channel,
+                       is_international, timestamp
+                FROM transactions
+                ORDER BY timestamp ASC
+            """).fetchall()
+        txs = []
+        for r in rows:
+            d = dict(r)
+            d["transaction_id"] = d.pop("id")
+            d["is_international"] = bool(d["is_international"])
+            txs.append(Transaction(**d))
+        return txs
+
     # ──────────────────────────────────────────────────────────────────────
     # Helpers
     # ──────────────────────────────────────────────────────────────────────

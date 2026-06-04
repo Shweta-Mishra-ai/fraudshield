@@ -41,10 +41,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Session state init ────────────────────────────────────────────────────
-if "detector"   not in st.session_state:
-    st.session_state.detector   = FraudDetector()
 if "storage"    not in st.session_state:
     st.session_state.storage    = FraudStorage()
+if "detector"   not in st.session_state:
+    st.session_state.detector   = FraudDetector()
+    try:
+        tx_list = st.session_state.storage.get_all_transactions()
+        if tx_list:
+            st.session_state.detector.hydrate(tx_list)
+    except Exception:
+        pass
 if "generator"  not in st.session_state:
     st.session_state.generator  = TransactionGenerator()
 if "running"    not in st.session_state:

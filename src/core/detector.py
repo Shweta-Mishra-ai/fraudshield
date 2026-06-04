@@ -161,6 +161,14 @@ class FraudDetector:
 
         return " ".join(parts)
 
+    def hydrate(self, tx_list: list[Transaction]) -> None:
+        """Warm up graph and features state with historical transactions."""
+        sorted_tx = sorted(tx_list, key=lambda tx: tx.timestamp)
+        for tx in sorted_tx:
+            self.features.update(tx)
+            self.graph.add_transaction(tx)
+            self._total_analyzed += 1
+
     # ──────────────────────────────────────────────────────────────────────
     # Stats
     # ──────────────────────────────────────────────────────────────────────
