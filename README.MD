@@ -1,6 +1,8 @@
 # 🛡️ Real-Time Fraud Detection System
 > **Enterprise-grade multi-layered transaction scoring engine** — blending deterministic rules, ensemble machine learning, and bipartite graph analytics into a unified low-latency prediction pipeline.
 
+⚡ **Live Demo (Streamlit Cloud)**: [Launch Live App](https://realtime-fraud-pathway-yk6vymdmgdfsue6lbappytf.streamlit.app/)
+
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg?style=flat-square&logo=python)](requirements.txt)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](src/api/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32%2B-FF4B4B.svg?style=flat-square&logo=streamlit)](dashboard/)
@@ -215,5 +217,5 @@ To scale this codebase to a high-throughput production environment:
 
 ## 👩‍💻 Authors & License
 
-* Developed by **Shweta Mishra** — Python Developer & Data Analyst (Founder @TechNova World)
+* Developed by **Shweta Mishra** — Data Scientist & AI/ML Engineer (Founder @TechNova World)
 * Open-source software licensed under the [MIT License](LICENSE).
