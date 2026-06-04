@@ -158,10 +158,6 @@ with tabs[0]:
     else:
         st.info("▶ Toggle 'Live Simulation' in the sidebar to start generating transactions.")
 
-    if auto_run:
-        time.sleep(refresh_rate)
-        st.rerun()
-
 
 # ══════════════════════════════════════════════════════════════════════════
 # TAB 2 — Alerts (Analyst Queue)
@@ -315,3 +311,8 @@ with tabs[4]:
         st.plotly_chart(fig3, use_container_width=True)
     else:
         st.info("Start live simulation to see analytics.")
+
+# ── Auto rerun at the very end of script to prevent breaking other tabs ────
+if auto_run:
+    time.sleep(refresh_rate)
+    st.rerun()
