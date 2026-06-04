@@ -59,7 +59,7 @@ generator = st.session_state.generator
 
 # ── Sidebar ───────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://img.shields.io/badge/Fraud%20Detection-v1.0-blue", use_column_width=True)
+    st.image("https://img.shields.io/badge/Fraud%20Detection-v1.0-blue", use_container_width=True)
     st.markdown("## ⚙️ Controls")
 
     refresh_rate = st.slider("Refresh interval (s)", 1, 10, 3)
