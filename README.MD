@@ -217,5 +217,5 @@ To scale this codebase to a high-throughput production environment:
 
 ## 👩‍💻 Authors & License
 
-* Developed by **Shweta Mishra** — Data Scientist & AI/ML Engineer (Founder @TechNova World)
+* Developed by **Shweta Mishra**
 * Open-source software licensed under the [MIT License](LICENSE).
