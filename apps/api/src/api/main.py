@@ -301,6 +301,24 @@ SecureDeps = [Depends(verify_api_key), Depends(rate_limit_middleware)]
 # ── System endpoints (no auth) ────────────────────────────────────────────
 
 
+@app.get("/", tags=["System"])
+async def root():
+    """Root endpoint returning system metadata and status."""
+    return {
+        "name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "status": "online",
+        "health": "/api/v2/health",
+        "docs": "/docs" if settings.ENABLE_DOCS else "disabled",
+    }
+
+
+@app.head("/", tags=["System"])
+async def root_head():
+    """Head probe endpoint for load balancers."""
+    return JSONResponse(status_code=200, content={})
+
+
 @app.get("/api/v2/health", tags=["System"])
 async def health():
     """
