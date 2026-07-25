@@ -50,8 +50,8 @@ On Linux/Mac: Open **Terminal**.
 
 ### Step 2: Clone the Repository
 ```bash
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield
 ```
 
 ### Step 3: Create & Activate Virtual Environment

@@ -7,7 +7,7 @@
 [![Pathway](https://img.shields.io/badge/Pathway-Streaming%20Engine-7C3AED.svg)](https://pathway.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-178%20Passed-brightgreen.svg)]()
-[![GitHub Stars](https://img.shields.io/github/stars/Shweta-Mishra-ai/realtime-fraud-pathway?style=social)](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway)
+[![GitHub Stars](https://img.shields.io/github/stars/Shweta-Mishra-ai/fraudshield?style=social)](https://github.com/Shweta-Mishra-ai/fraudshield)
 
 **FraudShield Real-Time** is an enterprise-grade, high-throughput fraud detection platform powered by **Pathway** real-time streaming pipelines, an **ML Ensemble (XGBoost + Isolation Forest)**, a **Dynamic 9-Rule Engine**, and a **User-Device-IP Graph Ring Analytics Engine**.
 
@@ -161,7 +161,7 @@ flowchart TD
 ## 📂 Repository Directory Structure
 
 ```
-realtime-fraud-pathway/
+fraudshield/
 ├── app.py                      # Top-level Streamlit entrypoint
 ├── generate_demo_output.py     # Demo benchmark generator
 ├── requirements.txt            # Master Python dependencies
@@ -199,8 +199,8 @@ For full instructions, read the dedicated **[SETUP_GUIDE.md](SETUP_GUIDE.md)**.
 
 ### Step 1: Clone Repository & Create Virtual Environment
 ```bash
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield
 
 # Create Python virtual environment
 python -m venv venv
@@ -320,8 +320,8 @@ python generate_demo_output.py
 If you find FraudShield helpful, inspiring, or useful for your projects, please take a second to **give it a Star ⭐ on GitHub**! Your support motivates continuous improvement and open-source contributions.
 
 <p align="center">
-  <a href="https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway">
-    <img src="https://img.shields.io/github/stars/Shweta-Mishra-ai/realtime-fraud-pathway?style=for-the-badge&logo=github&color=gold" alt="Give a Star on GitHub"/>
+  <a href="https://github.com/Shweta-Mishra-ai/fraudshield">
+    <img src="https://img.shields.io/github/stars/Shweta-Mishra-ai/fraudshield?style=for-the-badge&logo=github&color=gold" alt="Give a Star on GitHub"/>
   </a>
 </p>
 

@@ -2,7 +2,7 @@
 
 **Production-grade fraud detection engine.** Rule engine + ML ensemble + graph analytics + real-time streaming, wrapped in a secured REST API with sub-10ms decisions.
 
-[![API CI](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway/actions/workflows/api-ci.yml/badge.svg)](../../.github/workflows/api-ci.yml)
+[![API CI](https://github.com/Shweta-Mishra-ai/fraudshield/actions/workflows/api-ci.yml/badge.svg)](../../.github/workflows/api-ci.yml)
 [![Tests](https://img.shields.io/badge/tests-173%20passing-brightgreen)](tests/)
 [![Coverage](https://img.shields.io/badge/coverage-78%25-yellow)](tests/)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](requirements.txt)
@@ -93,8 +93,8 @@ Render's free tier does **not** share a filesystem between separate services. If
 ### Install and Run Locally
 
 ```bash
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway/apps/api
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield/apps/api
 
 pip install -r requirements.txt
 cp .env.example .env

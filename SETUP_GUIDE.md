@@ -37,8 +37,8 @@ Ensure you have the following installed on your development system:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield
 
 # 2. Create and activate a Python virtual environment
 python -m venv venv
@@ -196,4 +196,4 @@ npm run build
 
 ## ⭐ Show Your Support
 
-If this setup guide helped you get started, please **Give a Star ⭐** on the [FraudShield Repository](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway)!
+If this setup guide helped you get started, please **Give a Star ⭐** on the [FraudShield Repository](https://github.com/Shweta-Mishra-ai/fraudshield)!

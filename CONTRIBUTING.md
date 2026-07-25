@@ -30,7 +30,7 @@ We are committed to providing a welcoming, inclusive, and harassment-free enviro
 
 ### Reporting Bugs
 
-Before creating a bug report, please check the [existing issues](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway/issues) to avoid duplicates.
+Before creating a bug report, please check the [existing issues](https://github.com/Shweta-Mishra-ai/fraudshield/issues) to avoid duplicates.
 
 When filing a bug report, please include:
 - A clear and descriptive title.
@@ -51,8 +51,8 @@ Feature requests are always welcome! Please outline:
 
 ### 1. Fork & Clone
 ```bash
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield
 ```
 
 ### 2. Create a Feature Branch
@@ -141,4 +141,4 @@ Before submitting your PR, make sure you have completed the following:
 
 If you find FraudShield helpful, don't forget to **Give a Star ⭐** on GitHub!
 
-For questions or discussions, feel free to open a [GitHub Issue](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway/issues).
+For questions or discussions, feel free to open a [GitHub Issue](https://github.com/Shweta-Mishra-ai/fraudshield/issues).
