@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd apps/web && npm run build",
-  "devCommand": "cd apps/web && npm run dev",
-  "installCommand": "cd apps/web && npm install",
-  "outputDirectory": "apps/web/.next",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "if [ -d \"apps/web\" ]; then cd apps/web && npm run build; else npm run build; fi",
+  "devCommand": "if [ -d \"apps/web\" ]; then cd apps/web && npm run dev; else npm run dev; fi",
+  "installCommand": "if [ -d \"apps/web\" ]; then cd apps/web && npm install; else npm install; fi",
   "framework": "nextjs"
 }
