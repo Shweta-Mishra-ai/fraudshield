@@ -5,6 +5,7 @@ Fixes from audit:
   - JWT claim removed (not implemented — honest)
   - sanitize_string blocks path traversal + null bytes
 """
+
 from __future__ import annotations
 
 import hmac
@@ -37,10 +38,7 @@ def verify_api_key(api_key: Optional[str] = Security(API_KEY_HEADER)) -> str:
         )
 
     # Constant-time comparison — prevents timing attacks
-    valid = any(
-        hmac.compare_digest(api_key.encode(), k.encode())
-        for k in settings.API_KEYS
-    )
+    valid = any(hmac.compare_digest(api_key.encode(), k.encode()) for k in settings.API_KEYS)
     if not valid:
         logger.warning("Invalid API key attempt: %s...", api_key[:6])
         raise HTTPException(
@@ -52,6 +50,7 @@ def verify_api_key(api_key: Optional[str] = Security(API_KEY_HEADER)) -> str:
 
 # ── Rate Limiter ──────────────────────────────────────────────────────────
 
+
 class RateLimiter:
     """
     Sliding window rate limiter per IP.
@@ -60,14 +59,14 @@ class RateLimiter:
     """
 
     def __init__(self, requests_per_minute: int = 100, burst: int = 20) -> None:
-        self.rpm   = requests_per_minute
+        self.rpm = requests_per_minute
         self.burst = burst
         self._windows: Dict[str, list] = defaultdict(list)
         self._WINDOW = 60.0
 
     def check(self, ip: str) -> None:
         """Raise HTTP 429 if rate exceeded."""
-        now    = time.time()
+        now = time.time()
         window = self._windows[ip]
         cutoff = now - self._WINDOW
 
@@ -84,21 +83,23 @@ class RateLimiter:
         window.append(now)
 
     def get_usage(self, ip: str) -> Dict:
-        now    = time.time()
+        now = time.time()
         active = [t for t in self._windows[ip] if t >= now - self._WINDOW]
         return {
             "requests_last_minute": len(active),
-            "limit":     self.rpm,
+            "limit": self.rpm,
             "remaining": max(0, self.rpm - len(active)),
         }
 
 
 _rate_limiter: Optional[RateLimiter] = None
 
+
 def get_rate_limiter() -> RateLimiter:
     global _rate_limiter
     if _rate_limiter is None:
         from config.settings import settings
+
         _rate_limiter = RateLimiter(
             requests_per_minute=settings.RATE_LIMIT_PER_MINUTE,
             burst=settings.RATE_LIMIT_BURST,
@@ -113,18 +114,47 @@ async def rate_limit_middleware(request: Request) -> None:
 
 # ── Input Sanitization ────────────────────────────────────────────────────
 
-_ALPHANUM_DASH  = re.compile(r'^[a-zA-Z0-9_\-\.]+$')
-_COUNTRY_CODE   = re.compile(r'^[A-Z]{2}$')
+_ALPHANUM_DASH = re.compile(r"^[a-zA-Z0-9_\-\.]+$")
+_COUNTRY_CODE = re.compile(r"^[A-Z]{2}$")
 _CHANNEL_VALUES = {"online", "pos", "atm", "mobile", "web"}
-_CURRENCY_VALUES = {"USD", "EUR", "GBP", "INR", "JPY", "CAD", "AUD",
-                    "SGD", "AED", "CHF", "HKD", "CNY", "BRL", "MXN"}
+_CURRENCY_VALUES = {
+    "USD",
+    "EUR",
+    "GBP",
+    "INR",
+    "JPY",
+    "CAD",
+    "AUD",
+    "SGD",
+    "AED",
+    "CHF",
+    "HKD",
+    "CNY",
+    "BRL",
+    "MXN",
+}
 
 # Merchant categories — whitelist
 _MERCHANT_CATEGORIES = {
-    "grocery", "restaurant", "electronics", "travel", "pharmacy",
-    "utility", "jewelry", "crypto", "gambling", "wire_transfer",
-    "entertainment", "clothing", "fuel", "healthcare", "education",
-    "insurance", "real_estate", "automotive", "unknown",
+    "grocery",
+    "restaurant",
+    "electronics",
+    "travel",
+    "pharmacy",
+    "utility",
+    "jewelry",
+    "crypto",
+    "gambling",
+    "wire_transfer",
+    "entertainment",
+    "clothing",
+    "fuel",
+    "healthcare",
+    "education",
+    "insurance",
+    "real_estate",
+    "automotive",
+    "unknown",
 }
 
 
@@ -208,11 +238,11 @@ def sanitize_merchant_category(category: str) -> str:
 # ── Security Headers ──────────────────────────────────────────────────────
 
 SECURITY_HEADERS = {
-    "X-Content-Type-Options":    "nosniff",
-    "X-Frame-Options":           "DENY",
-    "X-XSS-Protection":          "1; mode=block",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-    "Cache-Control":             "no-store",
-    "Referrer-Policy":           "strict-origin-when-cross-origin",
-    "Permissions-Policy":        "geolocation=(), microphone=(), camera=()",
+    "Cache-Control": "no-store",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
 }

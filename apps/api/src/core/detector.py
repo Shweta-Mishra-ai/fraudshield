@@ -22,8 +22,8 @@ from ..ml.ensemble import MLEnsemble
 logger = logging.getLogger(__name__)
 
 # ── Ensemble weights ──────────────────────────────────────────────────────
-RULE_WEIGHT  = 0.40
-ML_WEIGHT    = 0.45
+RULE_WEIGHT = 0.40
+ML_WEIGHT = 0.45
 GRAPH_WEIGHT = 0.15
 
 
@@ -38,15 +38,15 @@ class FraudDetector:
 
     def __init__(
         self,
-        rule_engine:  Optional[RuleEngine]      = None,
-        ml_ensemble:  Optional[MLEnsemble]      = None,
+        rule_engine: Optional[RuleEngine] = None,
+        ml_ensemble: Optional[MLEnsemble] = None,
         graph_engine: Optional[FraudGraphEngine] = None,
-        feature_eng:  Optional[FeatureEngineer]  = None,
+        feature_eng: Optional[FeatureEngineer] = None,
     ) -> None:
-        self.rules    = rule_engine  or RuleEngine()
-        self.ml       = ml_ensemble  or MLEnsemble()
-        self.graph    = graph_engine or FraudGraphEngine()
-        self.features = feature_eng  or FeatureEngineer()
+        self.rules = rule_engine or RuleEngine()
+        self.ml = ml_ensemble or MLEnsemble()
+        self.graph = graph_engine or FraudGraphEngine()
+        self.features = feature_eng or FeatureEngineer()
         self._total_analyzed = 0
 
     # ──────────────────────────────────────────────────────────────────────
@@ -63,16 +63,18 @@ class FraudDetector:
         try:
             result = self._analyze_internal(tx)
         except Exception as exc:
-            logger.error("FraudDetector.analyze failed for tx %s: %s", tx.transaction_id, exc, exc_info=True)
+            logger.error(
+                "FraudDetector.analyze failed for tx %s: %s", tx.transaction_id, exc, exc_info=True
+            )
             # Fail-open: return LOW risk to avoid blocking legitimate traffic on errors
             result = FraudResult(
-                transaction_id = tx.transaction_id,
-                is_fraud       = False,
-                score          = 0.0,
-                risk_level     = RiskLevel.LOW,
-                decision       = Decision.ALLOW,
-                explanation_text = f"Evaluation error (fail-open): {exc}",
-                model_version  = self.ml.version,
+                transaction_id=tx.transaction_id,
+                is_fraud=False,
+                score=0.0,
+                risk_level=RiskLevel.LOW,
+                decision=Decision.ALLOW,
+                explanation_text=f"Evaluation error (fail-open): {exc}",
+                model_version=self.ml.version,
             )
 
         result.latency_ms = round((time.perf_counter() - t_start) * 1000, 2)
@@ -80,7 +82,10 @@ class FraudDetector:
 
         logger.debug(
             "tx=%s score=%.3f decision=%s latency=%.1fms",
-            tx.transaction_id[:8], result.score, result.decision.value, result.latency_ms
+            tx.transaction_id[:8],
+            result.score,
+            result.decision.value,
+            result.latency_ms,
         )
         return result
 
@@ -102,11 +107,7 @@ class FraudDetector:
         ml_score, top_features = self.ml.score(fvec)
 
         # ── 5. Ensemble blend ─────────────────────────────────────────────
-        final_score = (
-            RULE_WEIGHT  * rule_score +
-            ML_WEIGHT    * ml_score   +
-            GRAPH_WEIGHT * graph_score
-        )
+        final_score = RULE_WEIGHT * rule_score + ML_WEIGHT * ml_score + GRAPH_WEIGHT * graph_score
         final_score = round(min(final_score, 1.0), 4)
 
         # ── 5b. CRITICAL RULE HARD OVERRIDE ────────────────────────────────
@@ -122,19 +123,18 @@ class FraudDetector:
 
         # ── 6. Risk classification ────────────────────────────────────────
         risk_level = RiskLevel.from_score(final_score)
-        decision   = Decision.BLOCK if has_critical_rule else Decision.from_score(final_score)
+        decision = Decision.BLOCK if has_critical_rule else Decision.from_score(final_score)
         # FIX: is_fraud must mean "confirmed high-confidence fraud" (BLOCK only).
         # REVIEW means "ambiguous, needs human judgment" — NOT confirmed fraud.
         # Conflating the two caused misleading stats (e.g. "60% fraud rate"
         # when most were just flagged for analyst review, not actual fraud).
         # Downstream consumers should still check `decision` for the full
         # ALLOW / REVIEW / BLOCK picture.
-        is_fraud   = decision == Decision.BLOCK
+        is_fraud = decision == Decision.BLOCK
 
         # ── 7. Human-readable explanation ─────────────────────────────────
         explanation = self._build_explanation(
-            final_score, rule_score, ml_score, graph_score,
-            rule_results, top_features
+            final_score, rule_score, ml_score, graph_score, rule_results, top_features
         )
 
         # ── 8. Update state (AFTER scoring to avoid data leakage) ─────────
@@ -142,27 +142,28 @@ class FraudDetector:
         self.graph.add_transaction(tx)
 
         return FraudResult(
-            transaction_id = tx.transaction_id,
-            is_fraud       = is_fraud,
-            score          = final_score,
-            risk_level     = risk_level,
-            decision       = decision,
-            rule_results   = rule_results,
-            top_features   = top_features,
-            explanation_text = explanation,
-            rule_score     = rule_score,
-            ml_score       = ml_score,
-            graph_score    = graph_score,
-            model_version  = self.ml.version,
+            transaction_id=tx.transaction_id,
+            is_fraud=is_fraud,
+            score=final_score,
+            risk_level=risk_level,
+            decision=decision,
+            rule_results=rule_results,
+            top_features=top_features,
+            explanation_text=explanation,
+            rule_score=rule_score,
+            ml_score=ml_score,
+            graph_score=graph_score,
+            model_version=self.ml.version,
         )
 
     @staticmethod
     def _build_explanation(
-        final_score, rule_score, ml_score, graph_score,
-        rule_results, top_features
+        final_score, rule_score, ml_score, graph_score, rule_results, top_features
     ) -> str:
-        parts = [f"Ensemble score: {final_score:.3f} "
-                 f"(rules={rule_score:.2f}, ml={ml_score:.2f}, graph={graph_score:.2f})."]
+        parts = [
+            f"Ensemble score: {final_score:.3f} "
+            f"(rules={rule_score:.2f}, ml={ml_score:.2f}, graph={graph_score:.2f})."
+        ]
 
         triggered = [r for r in rule_results if r.triggered]
         if triggered:
@@ -192,9 +193,9 @@ class FraudDetector:
 
     def get_system_status(self) -> dict:
         return {
-            "total_analyzed":  self._total_analyzed,
-            "xgb_trained":     self.ml.xgb_ready,
-            "iso_warm":        self.ml.iso_warm,
-            "graph_stats":     self.graph.get_stats(),
-            "model_version":   self.ml.version,
+            "total_analyzed": self._total_analyzed,
+            "xgb_trained": self.ml.xgb_ready,
+            "iso_warm": self.ml.iso_warm,
+            "graph_stats": self.graph.get_stats(),
+            "model_version": self.ml.version,
         }

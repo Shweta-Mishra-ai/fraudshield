@@ -2,70 +2,85 @@
 Centralized configuration — all settings via environment variables.
 SECURITY: In production, startup FAILS if unsafe defaults are present.
 """
+
 from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from typing import List
 
-_UNSAFE_API_KEYS  = {"dev-key-change-in-prod", "dev-key-local-only", "another-key", ""}
-_UNSAFE_SECRETS   = {"change-me-in-production", "super-secret-change-in-production-min-32-chars", ""}
+_UNSAFE_API_KEYS = {"dev-key-change-in-prod", "dev-key-local-only", "another-key", ""}
+_UNSAFE_SECRETS = {"change-me-in-production", "super-secret-change-in-production-min-32-chars", ""}
 
 
 @dataclass
 class Settings:
     # ── App ───────────────────────────────────────────────────────────────
-    APP_NAME:    str  = "Fraud Detection API"
-    APP_VERSION: str  = "2.1.0"
-    ENVIRONMENT: str  = field(default_factory=lambda: os.getenv("ENVIRONMENT", "production"))
-    DEBUG:       bool = field(default_factory=lambda: os.getenv("DEBUG","false").lower()=="true")
-    LOG_LEVEL:   str  = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
+    APP_NAME: str = "Fraud Detection API"
+    APP_VERSION: str = "2.1.0"
+    ENVIRONMENT: str = field(default_factory=lambda: os.getenv("ENVIRONMENT", "production"))
+    DEBUG: bool = field(default_factory=lambda: os.getenv("DEBUG", "false").lower() == "true")
+    LOG_LEVEL: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
 
     # ── API Security ──────────────────────────────────────────────────────
-    API_KEY_HEADER: str     = "X-API-Key"
-    API_KEYS: List[str]     = field(default_factory=lambda: [
-        k.strip() for k in os.getenv("API_KEYS", "dev-key-change-in-prod").split(",") if k.strip()
-    ])
-    JWT_SECRET: str         = field(default_factory=lambda: os.getenv(
-        "JWT_SECRET", "change-me-in-production"))
-    JWT_ALGORITHM: str      = "HS256"
+    API_KEY_HEADER: str = "X-API-Key"
+    API_KEYS: List[str] = field(
+        default_factory=lambda: [
+            k.strip()
+            for k in os.getenv("API_KEYS", "dev-key-change-in-prod").split(",")
+            if k.strip()
+        ]
+    )
+    JWT_SECRET: str = field(
+        default_factory=lambda: os.getenv("JWT_SECRET", "change-me-in-production")
+    )
+    JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60
 
     # ── Rate Limiting ─────────────────────────────────────────────────────
-    RATE_LIMIT_PER_MINUTE: int = field(default_factory=lambda: int(os.getenv("RATE_LIMIT","100")))
-    RATE_LIMIT_BURST: int      = 20
-    BATCH_SIZE_LIMIT: int      = 100
+    RATE_LIMIT_PER_MINUTE: int = field(default_factory=lambda: int(os.getenv("RATE_LIMIT", "100")))
+    RATE_LIMIT_BURST: int = 20
+    BATCH_SIZE_LIMIT: int = 100
 
     # ── Database ──────────────────────────────────────────────────────────
     DB_PATH: str = field(default_factory=lambda: os.getenv("DB_PATH", "data/fraud.db"))
 
     # ── Pathway Streaming ─────────────────────────────────────────────────
-    PATHWAY_INPUT_DIR:  str = field(default_factory=lambda: os.getenv("PATHWAY_INPUT_DIR","data/transactions"))
-    PATHWAY_ALERTS_DIR: str = field(default_factory=lambda: os.getenv("PATHWAY_ALERTS_DIR","data/alerts"))
-    PATHWAY_MODE:       str = field(default_factory=lambda: os.getenv("PATHWAY_MODE","streaming"))
+    PATHWAY_INPUT_DIR: str = field(
+        default_factory=lambda: os.getenv("PATHWAY_INPUT_DIR", "data/transactions")
+    )
+    PATHWAY_ALERTS_DIR: str = field(
+        default_factory=lambda: os.getenv("PATHWAY_ALERTS_DIR", "data/alerts")
+    )
+    PATHWAY_MODE: str = field(default_factory=lambda: os.getenv("PATHWAY_MODE", "streaming"))
 
     # ── ML ────────────────────────────────────────────────────────────────
-    MODEL_VERSION:       str   = "2.1.0"
-    RULE_WEIGHT:         float = 0.40
-    ML_WEIGHT:           float = 0.45
-    GRAPH_WEIGHT:        float = 0.15
-    FRAUD_THRESHOLD:     float = 0.80
-    REVIEW_THRESHOLD:    float = 0.40
+    MODEL_VERSION: str = "2.1.0"
+    RULE_WEIGHT: float = 0.40
+    ML_WEIGHT: float = 0.45
+    GRAPH_WEIGHT: float = 0.15
+    FRAUD_THRESHOLD: float = 0.80
+    REVIEW_THRESHOLD: float = 0.40
 
     # ── CORS — restrict in production ─────────────────────────────────────
-    ALLOWED_ORIGINS: List[str] = field(default_factory=lambda: [
-        o.strip() for o in os.getenv(
-            "ALLOWED_ORIGINS",
-            # Default: only allow localhost in dev; prod MUST set this env var
-            "http://localhost:8501,http://localhost:3000"
-        ).split(",")
-    ])
+    ALLOWED_ORIGINS: List[str] = field(
+        default_factory=lambda: [
+            o.strip()
+            for o in os.getenv(
+                "ALLOWED_ORIGINS",
+                # Default: only allow localhost in dev; prod MUST set this env var
+                "http://localhost:8501,http://localhost:3000",
+            ).split(",")
+        ]
+    )
 
     # ── Render / Deploy ───────────────────────────────────────────────────
     PORT: int = field(default_factory=lambda: int(os.getenv("PORT", "8000")))
     HOST: str = field(default_factory=lambda: os.getenv("HOST", "0.0.0.0"))
 
     # ── Docs exposure ─────────────────────────────────────────────────────
-    ENABLE_DOCS: bool = field(default_factory=lambda: os.getenv("ENABLE_DOCS","true").lower()=="true")
+    ENABLE_DOCS: bool = field(
+        default_factory=lambda: os.getenv("ENABLE_DOCS", "true").lower() == "true"
+    )
 
     def is_production(self) -> bool:
         return self.ENVIRONMENT == "production"

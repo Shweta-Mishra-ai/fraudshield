@@ -3,11 +3,13 @@ Regression tests for critical production fixes.
 These specifically guard against the bugs found and fixed during
 the pre-deployment audit — they must never regress.
 """
+
 from __future__ import annotations
 import os
 import sys
 import time
 import uuid
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import pytest
@@ -19,11 +21,21 @@ from src.core.storage import FraudStorage
 
 
 def tx(**kw) -> Transaction:
-    d = dict(transaction_id=str(uuid.uuid4()), user_id="U001", amount=100.0,
-             currency="USD", timestamp=time.time(), merchant_id="M001",
-             merchant_category="grocery", location="US", device_id="D001",
-             ip_address="192.168.1.1", is_international=False,
-             is_card_present=True, channel="online")
+    d = dict(
+        transaction_id=str(uuid.uuid4()),
+        user_id="U001",
+        amount=100.0,
+        currency="USD",
+        timestamp=time.time(),
+        merchant_id="M001",
+        merchant_category="grocery",
+        location="US",
+        device_id="D001",
+        ip_address="192.168.1.1",
+        is_international=False,
+        is_card_present=True,
+        channel="online",
+    )
     d.update(kw)
     return Transaction(**d)
 
@@ -31,6 +43,7 @@ def tx(**kw) -> Transaction:
 # ══════════════════════════════════════════════════════════════════════════
 # FIX #1 — Critical rule hard-override (extreme fraud must BLOCK, not REVIEW)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestCriticalOverride:
     """
@@ -72,6 +85,7 @@ class TestCriticalOverride:
 # FIX #2 — is_fraud semantics (must mean confirmed BLOCK, not ambiguous REVIEW)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestIsFraudSemantics:
     """
     Bug: is_fraud was True for both REVIEW and BLOCK decisions, causing
@@ -99,10 +113,14 @@ class TestIsFraudSemantics:
         # new country, elevated amount
         for i in range(10):
             det.analyze(tx(transaction_id=f"hist-{i}", user_id="ESTABLISHED_USER"))
-        result = det.analyze(tx(
-            transaction_id="review-case", user_id="ESTABLISHED_USER",
-            amount=1000.0, location="JP",
-        ))
+        result = det.analyze(
+            tx(
+                transaction_id="review-case",
+                user_id="ESTABLISHED_USER",
+                amount=1000.0,
+                location="JP",
+            )
+        )
         if result.decision == Decision.REVIEW:
             assert result.is_fraud is False
 
@@ -121,6 +139,7 @@ class TestIsFraudSemantics:
 # ══════════════════════════════════════════════════════════════════════════
 # FIX #3 — Memory safety (graph must not grow unbounded)
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestMemorySafety:
     """
@@ -175,6 +194,7 @@ class TestMemorySafety:
 # FIX #4 — Cold-start (must not regress to false-positive epidemic)
 # ══════════════════════════════════════════════════════════════════════════
 
+
 class TestColdStartRegression:
     def test_new_users_mostly_allowed(self):
         det = FraudDetector()
@@ -184,7 +204,8 @@ class TestColdStartRegression:
             t = tx(
                 transaction_id=str(uuid.uuid4()),
                 user_id=f"NEW_{uuid.uuid4().hex[:8]}",
-                amount=100.0, merchant_category="grocery",
+                amount=100.0,
+                merchant_category="grocery",
                 device_id=f"UDEV_{uuid.uuid4().hex[:8]}",
                 ip_address=f"10.{i}.1.1",
             )
@@ -197,6 +218,7 @@ class TestColdStartRegression:
 # ══════════════════════════════════════════════════════════════════════════
 # Load / Stress Testing
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestLoadHandling:
     def test_1000_transactions_zero_crashes(self):
@@ -238,6 +260,7 @@ class TestLoadHandling:
 # ══════════════════════════════════════════════════════════════════════════
 # Error Handling — malformed / adversarial input
 # ══════════════════════════════════════════════════════════════════════════
+
 
 class TestErrorHandling:
     def test_zero_amount_rejected_at_model_level(self):

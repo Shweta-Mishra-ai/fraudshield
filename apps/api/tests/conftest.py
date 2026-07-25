@@ -3,6 +3,7 @@ Pytest configuration — shared fixtures across all test modules.
 Ensures environment is set to 'development' so production secret
 validation doesn't block test runs.
 """
+
 import os
 import sys
 from pathlib import Path
@@ -43,6 +44,7 @@ def _deterministic_randomness():
     all randomized generator output fully reproducible.
     """
     import random
+
     random.seed(42)
     yield
 
@@ -54,6 +56,7 @@ def _reset_rate_limiter_between_tests():
     request volume can bleed into another test's pass/fail outcome.
     """
     import src.security.auth as auth_module
+
     auth_module._rate_limiter = None
     yield
 

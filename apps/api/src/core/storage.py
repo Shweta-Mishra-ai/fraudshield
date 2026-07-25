@@ -86,8 +86,8 @@ class FraudStorage:
     RETENTION_DAYS = 90
 
     def __init__(self, db_path: str = "data/fraud.db") -> None:
-        self.db_path  = db_path
-        self._use_pg  = bool(os.getenv("DATABASE_URL"))
+        self.db_path = db_path
+        self._use_pg = bool(os.getenv("DATABASE_URL"))
         self._pg_pool = None
 
         if self._use_pg:
@@ -104,9 +104,12 @@ class FraudStorage:
     def _init_postgres(self) -> None:
         try:
             from psycopg2 import pool as pg_pool
+
             self._pg_pool = pg_pool.ThreadedConnectionPool(
-                minconn=1, maxconn=10,
-                dsn=os.getenv("DATABASE_URL"), sslmode="require",
+                minconn=1,
+                maxconn=10,
+                dsn=os.getenv("DATABASE_URL"),
+                sslmode="require",
             )
             logger.info("PostgreSQL initialized")
         except Exception as exc:
@@ -143,43 +146,72 @@ class FraudStorage:
     def save(self, tx: Transaction, result: FraudResult) -> None:
         """Save with PII hashing."""
         device_hash = _hash_pii(tx.device_id)
-        ip_hash     = _hash_pii(tx.ip_address)
+        ip_hash = _hash_pii(tx.ip_address)
         with self._conn() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO transactions
                 (id, user_id, amount, currency, location, merchant_id,
                  merchant_category, device_hash, ip_hash, channel,
                  is_international, is_card_present, timestamp)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-            """, (tx.transaction_id, tx.user_id, tx.amount, tx.currency,
-                  tx.location, tx.merchant_id, tx.merchant_category,
-                  device_hash, ip_hash, tx.channel,
-                  int(tx.is_international), int(tx.is_card_present), tx.timestamp))
+            """,
+                (
+                    tx.transaction_id,
+                    tx.user_id,
+                    tx.amount,
+                    tx.currency,
+                    tx.location,
+                    tx.merchant_id,
+                    tx.merchant_category,
+                    device_hash,
+                    ip_hash,
+                    tx.channel,
+                    int(tx.is_international),
+                    int(tx.is_card_present),
+                    tx.timestamp,
+                ),
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT OR REPLACE INTO fraud_results
                 (id, is_fraud, score, risk_level, decision,
                  rule_score, ml_score, graph_score,
                  reasons, top_features, explanation,
                  latency_ms, model_version, evaluated_at)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-            """, (result.transaction_id, int(result.is_fraud), result.score,
-                  result.risk_level.value, result.decision.value,
-                  result.rule_score, result.ml_score, result.graph_score,
-                  json.dumps(result.primary_reasons),
-                  json.dumps(result.top_features),
-                  result.explanation_text, result.latency_ms,
-                  result.model_version, result.evaluated_at))
+            """,
+                (
+                    result.transaction_id,
+                    int(result.is_fraud),
+                    result.score,
+                    result.risk_level.value,
+                    result.decision.value,
+                    result.rule_score,
+                    result.ml_score,
+                    result.graph_score,
+                    json.dumps(result.primary_reasons),
+                    json.dumps(result.top_features),
+                    result.explanation_text,
+                    result.latency_ms,
+                    result.model_version,
+                    result.evaluated_at,
+                ),
+            )
 
     save_transaction = save
 
     def update_analyst_review(self, transaction_id: str, label: bool, notes: str = "") -> None:
         with self._conn() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 UPDATE fraud_results
                 SET analyst_label=?, analyst_notes=?, reviewed_at=?
                 WHERE id=?
-            """, (int(label), notes, time.time(), transaction_id))
+            """,
+                (int(label), notes, time.time(), transaction_id),
+            )
 
     def purge_old_transactions(self) -> int:
         cutoff = time.time() - (self.RETENTION_DAYS * 86400)
@@ -192,7 +224,8 @@ class FraudStorage:
 
     def get_recent(self, limit: int = 50) -> List[Dict]:
         with self._conn() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT t.id, t.user_id, t.amount, t.currency, t.location,
                        t.merchant_id, t.merchant_category, t.timestamp,
                        t.is_card_present,
@@ -201,12 +234,15 @@ class FraudStorage:
                 FROM transactions t
                 JOIN fraud_results r ON t.id = r.id
                 ORDER BY t.timestamp DESC LIMIT ?
-            """, (limit,)).fetchall()
+            """,
+                (limit,),
+            ).fetchall()
         return [self._row_to_dict(r) for r in rows]
 
     def get_alerts(self, limit: int = 20) -> List[Dict]:
         with self._conn() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT t.id, t.user_id, t.amount, t.location, t.timestamp,
                        t.merchant_category, t.is_card_present,
                        r.score, r.risk_level, r.decision,
@@ -216,70 +252,83 @@ class FraudStorage:
                 WHERE r.decision IN ('REVIEW','BLOCK')
                   AND r.analyst_label IS NULL
                 ORDER BY r.score DESC LIMIT ?
-            """, (limit,)).fetchall()
+            """,
+                (limit,),
+            ).fetchall()
         return [self._row_to_dict(r) for r in rows]
 
     def get_stats(self) -> Dict:
         with self._conn() as conn:
-            total   = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
-            fraud   = conn.execute("SELECT COUNT(*) FROM fraud_results WHERE is_fraud=1").fetchone()[0]
-            blocked = conn.execute("SELECT COUNT(*) FROM fraud_results WHERE decision='BLOCK'").fetchone()[0]
-            avg_s   = conn.execute("SELECT AVG(score) FROM fraud_results").fetchone()[0] or 0
-            avg_l   = conn.execute("SELECT AVG(latency_ms) FROM fraud_results").fetchone()[0] or 0
+            total = conn.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+            fraud = conn.execute("SELECT COUNT(*) FROM fraud_results WHERE is_fraud=1").fetchone()[
+                0
+            ]
+            blocked = conn.execute(
+                "SELECT COUNT(*) FROM fraud_results WHERE decision='BLOCK'"
+            ).fetchone()[0]
+            avg_s = conn.execute("SELECT AVG(score) FROM fraud_results").fetchone()[0] or 0
+            avg_l = conn.execute("SELECT AVG(latency_ms) FROM fraud_results").fetchone()[0] or 0
             pending = conn.execute(
                 "SELECT COUNT(*) FROM fraud_results "
                 "WHERE analyst_label IS NULL AND decision!='ALLOW'"
             ).fetchone()[0]
         return {
             "total_transactions": total,
-            "fraud_count":        fraud,
-            "fraud_rate":         round(fraud/total*100,2) if total else 0,
-            "blocked_count":      blocked,
-            "avg_risk_score":     round(avg_s,4),
-            "avg_latency_ms":     round(avg_l,2),
-            "pending_review":     pending,
+            "fraud_count": fraud,
+            "fraud_rate": round(fraud / total * 100, 2) if total else 0,
+            "blocked_count": blocked,
+            "avg_risk_score": round(avg_s, 4),
+            "avg_latency_ms": round(avg_l, 2),
+            "pending_review": pending,
         }
 
     def get_user_history(self, user_id: str, limit: int = 30) -> List[Dict]:
         with self._conn() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT t.id, t.amount, t.location, t.merchant_category,
                        t.timestamp, t.is_card_present,
                        r.score, r.decision, r.is_fraud
                 FROM transactions t
                 JOIN fraud_results r ON t.id = r.id
                 WHERE t.user_id=? ORDER BY t.timestamp DESC LIMIT ?
-            """, (user_id, limit)).fetchall()
+            """,
+                (user_id, limit),
+            ).fetchall()
         return [self._row_to_dict(r) for r in rows]
 
     def get_all_transactions(self) -> List[Transaction]:
         with self._conn() as conn:
-            rows = conn.execute("""
+            rows = conn.execute(
+                """
                 SELECT id, user_id, amount, currency, location,
                        merchant_id, merchant_category,
                        device_hash, ip_hash, channel,
                        is_international, is_card_present, timestamp
                 FROM transactions ORDER BY timestamp ASC LIMIT 10000
-            """).fetchall()
+            """
+            ).fetchall()
         txns = []
         for row in rows:
             d = dict(row)
             try:
-                txns.append(Transaction(
-                    transaction_id    = d["id"],
-                    user_id           = d["user_id"],
-                    amount            = d["amount"],
-                    currency          = d.get("currency","USD"),
-                    timestamp         = d["timestamp"],
-                    merchant_id       = d["merchant_id"],
-                    merchant_category = d.get("merchant_category","unknown"),
-                    location          = d["location"],
-                    device_id         = d["device_hash"],
-                    ip_address        = d["ip_hash"],
-                    is_international  = bool(d.get("is_international",0)),
-                    is_card_present   = bool(d.get("is_card_present",1)),
-                    channel           = d.get("channel","online"),
-                ))
+                txns.append(
+                    Transaction(
+                        transaction_id=d["id"],
+                        user_id=d["user_id"],
+                        amount=d["amount"],
+                        currency=d.get("currency", "USD"),
+                        timestamp=d["timestamp"],
+                        merchant_id=d["merchant_id"],
+                        merchant_category=d.get("merchant_category", "unknown"),
+                        location=d["location"],
+                        device_id=d["device_hash"],
+                        ip_address=d["ip_hash"],
+                        is_international=bool(d.get("is_international", 0)),
+                        is_card_present=bool(d.get("is_card_present", 1)),
+                        channel=d.get("channel", "online"),
+                    )
+                )
             except Exception as exc:
                 logger.warning("Skipping row %s: %s", d.get("id"), exc)
         return txns

@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 # Optional imports — degrade gracefully if not installed
 try:
     import xgboost as xgb
+
     XGB_AVAILABLE = True
 except ImportError:
     XGB_AVAILABLE = False
@@ -32,6 +33,7 @@ except ImportError:
 
 try:
     import shap
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
@@ -44,6 +46,7 @@ VERSION = "1.0.0"
 # ──────────────────────────────────────────────
 # IsolationForest Wrapper
 # ──────────────────────────────────────────────
+
 
 class IsoForestDetector:
     """
@@ -101,7 +104,7 @@ class IsoForestDetector:
         score high. Every new user first transaction has both.
         Only score signals suspicious regardless of history.
         """
-        score      = 0.0
+        score = 0.0
         is_new_usr = f.txn_count_24h < 3
 
         # Amount anomaly only meaningful with established history
@@ -135,6 +138,7 @@ class IsoForestDetector:
 
         return min(score, 1.0)
 
+
 class XGBDetector:
     """
     Supervised XGBoost classifier.
@@ -153,7 +157,7 @@ class XGBDetector:
                 learning_rate=0.05,
                 subsample=0.8,
                 colsample_bytree=0.8,
-                scale_pos_weight=20,   # fraud is ~5% of data → upweight
+                scale_pos_weight=20,  # fraud is ~5% of data → upweight
                 use_label_encoder=False,
                 eval_metric="auc",
                 random_state=42,
@@ -220,6 +224,7 @@ class XGBDetector:
     def _is_fitted(self) -> bool:
         try:
             from sklearn.utils.validation import check_is_fitted
+
             check_is_fitted(self._model)
             return True
         except Exception:
@@ -229,6 +234,7 @@ class XGBDetector:
 # ──────────────────────────────────────────────
 # Ensemble
 # ──────────────────────────────────────────────
+
 
 class MLEnsemble:
     """
@@ -277,6 +283,7 @@ class MLEnsemble:
 
 # ── Auto-load trained model ───────────────────────────────────────────────
 
+
 def load_saved_model(model_path: str = "data/models/xgboost_model.json") -> "MLEnsemble":
     """
     Load a previously trained XGBoost model into a fresh MLEnsemble.
@@ -302,6 +309,7 @@ def load_saved_model(model_path: str = "data/models/xgboost_model.json") -> "MLE
 
     try:
         import xgboost as xgb
+
         model = xgb.XGBClassifier()
         model.load_model(str(model_file))
         ensemble.xgb._model = model
@@ -313,16 +321,14 @@ def load_saved_model(model_path: str = "data/models/xgboost_model.json") -> "MLE
                 meta = json.load(f)
             auc = meta.get("metrics", {}).get("auc_roc", "?")
             trained_at = meta.get("trained_at", "?")
-            logger.info(
-                "XGBoost model loaded: AUC=%.4f trained_at=%s",
-                auc, trained_at
-            )
+            logger.info("XGBoost model loaded: AUC=%.4f trained_at=%s", auc, trained_at)
         else:
             logger.info("XGBoost model loaded from %s", model_path)
 
         # Build SHAP explainer
         if SHAP_AVAILABLE:
             import shap as shap_lib
+
             ensemble.xgb._explainer = shap_lib.TreeExplainer(model)
             logger.info("SHAP explainer initialized")
 

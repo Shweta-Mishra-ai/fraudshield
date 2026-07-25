@@ -17,10 +17,11 @@ from typing import Any, Dict, List, Optional
 # Enums
 # ──────────────────────────────────────────────
 
+
 class RiskLevel(str, Enum):
-    LOW    = "LOW"
+    LOW = "LOW"
     MEDIUM = "MEDIUM"
-    HIGH   = "HIGH"
+    HIGH = "HIGH"
     CRITICAL = "CRITICAL"
 
     @classmethod
@@ -35,9 +36,9 @@ class RiskLevel(str, Enum):
 
 
 class Decision(str, Enum):
-    ALLOW  = "ALLOW"
+    ALLOW = "ALLOW"
     REVIEW = "REVIEW"
-    BLOCK  = "BLOCK"
+    BLOCK = "BLOCK"
 
     @classmethod
     def from_score(cls, score: float) -> "Decision":
@@ -62,25 +63,27 @@ class Currency(str, Enum):
 # Transaction
 # ──────────────────────────────────────────────
 
+
 @dataclass
 class Transaction:
     """
     Represents a single financial transaction.
     All fields are validated on creation.
     """
+
     transaction_id: str
     user_id: str
     amount: float
     currency: str
-    timestamp: float          # Unix epoch (UTC)
+    timestamp: float  # Unix epoch (UTC)
     merchant_id: str
-    merchant_category: str    # MCC code string, e.g. "grocery"
-    location: str             # ISO-3166 country code, e.g. "US"
+    merchant_category: str  # MCC code string, e.g. "grocery"
+    location: str  # ISO-3166 country code, e.g. "US"
     device_id: str
     ip_address: str
     is_international: bool = False
     is_card_present: bool = True
-    channel: str = "online"   # online | pos | atm | mobile
+    channel: str = "online"  # online | pos | atm | mobile
 
     # ── factory ──────────────────────────────
 
@@ -105,19 +108,19 @@ class Transaction:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "transaction_id":   self.transaction_id,
-            "user_id":          self.user_id,
-            "amount":           self.amount,
-            "currency":         self.currency,
-            "timestamp":        self.timestamp,
-            "merchant_id":      self.merchant_id,
+            "transaction_id": self.transaction_id,
+            "user_id": self.user_id,
+            "amount": self.amount,
+            "currency": self.currency,
+            "timestamp": self.timestamp,
+            "merchant_id": self.merchant_id,
             "merchant_category": self.merchant_category,
-            "location":         self.location,
-            "device_id":        self.device_id,
-            "ip_address":       self.ip_address,
+            "location": self.location,
+            "device_id": self.device_id,
+            "ip_address": self.ip_address,
             "is_international": self.is_international,
-            "is_card_present":  self.is_card_present,
-            "channel":          self.channel,
+            "is_card_present": self.is_card_present,
+            "channel": self.channel,
         }
 
     @classmethod
@@ -129,34 +132,36 @@ class Transaction:
 # Feature Vector
 # ──────────────────────────────────────────────
 
+
 @dataclass
 class FeatureVector:
     """
     Engineered features derived from a Transaction + history.
     Used as ML model input — separates feature engineering from detection.
     """
+
     # Amount features
     amount: float
     amount_log: float
-    amount_zscore: float          # deviation from user's own average
-    amount_vs_merchant_avg: float # deviation from merchant's average
+    amount_zscore: float  # deviation from user's own average
+    amount_vs_merchant_avg: float  # deviation from merchant's average
 
     # Velocity features
-    txn_count_1h: int     # user's transactions in last 1 hour
-    txn_count_24h: int    # user's transactions in last 24 hours
+    txn_count_1h: int  # user's transactions in last 1 hour
+    txn_count_24h: int  # user's transactions in last 24 hours
     amount_sum_1h: float  # total spend in last 1 hour
-    amount_sum_24h: float # total spend in last 24 hours
+    amount_sum_24h: float  # total spend in last 24 hours
 
     # Temporal features
-    hour_of_day: int      # 0–23
-    day_of_week: int      # 0 = Monday
+    hour_of_day: int  # 0–23
+    day_of_week: int  # 0 = Monday
     is_weekend: bool
-    is_night: bool        # 00:00–05:59 local
+    is_night: bool  # 00:00–05:59 local
 
     # Geo / device features
     location_encoded: int
-    is_new_location: bool   # first time in this country for user
-    is_new_device: bool     # first time this device appears
+    is_new_location: bool  # first time in this country for user
+    is_new_device: bool  # first time this device appears
     device_encoded: int
     ip_encoded: int
 
@@ -166,8 +171,8 @@ class FeatureVector:
 
     # Graph features
     shared_device_user_count: int  # how many users share this device
-    shared_ip_user_count: int      # how many users share this IP
-    user_fraud_ring_score: float   # graph-derived ring membership score
+    shared_ip_user_count: int  # how many users share this IP
+    user_fraud_ring_score: float  # graph-derived ring membership score
 
     def to_array(self) -> List[float]:
         """Return ordered numeric array for ML model input."""
@@ -197,13 +202,27 @@ class FeatureVector:
         ]
 
     FEATURE_NAMES = [
-        "amount", "amount_log", "amount_zscore", "amount_vs_merchant_avg",
-        "txn_count_1h", "txn_count_24h", "amount_sum_1h", "amount_sum_24h",
-        "hour_of_day", "day_of_week", "is_weekend", "is_night",
-        "location_encoded", "is_new_location", "is_new_device",
-        "device_encoded", "ip_encoded",
-        "merchant_risk_score", "is_high_risk_merchant",
-        "shared_device_user_count", "shared_ip_user_count",
+        "amount",
+        "amount_log",
+        "amount_zscore",
+        "amount_vs_merchant_avg",
+        "txn_count_1h",
+        "txn_count_24h",
+        "amount_sum_1h",
+        "amount_sum_24h",
+        "hour_of_day",
+        "day_of_week",
+        "is_weekend",
+        "is_night",
+        "location_encoded",
+        "is_new_location",
+        "is_new_device",
+        "device_encoded",
+        "ip_encoded",
+        "merchant_risk_score",
+        "is_high_risk_merchant",
+        "shared_device_user_count",
+        "shared_ip_user_count",
         "user_fraud_ring_score",
     ]
 
@@ -212,12 +231,14 @@ class FeatureVector:
 # Rule Result
 # ──────────────────────────────────────────────
 
+
 @dataclass
 class RuleResult:
     """Result from a single rule evaluation."""
+
     rule_name: str
     triggered: bool
-    score: float           # 0.0 – 1.0
+    score: float  # 0.0 – 1.0
     reason: str
     evidence: Dict[str, Any] = field(default_factory=dict)
     # FIX (critical-rule override): when True, this rule represents a
@@ -232,15 +253,17 @@ class RuleResult:
 # Fraud Result  (final decision)
 # ──────────────────────────────────────────────
 
+
 @dataclass
 class FraudResult:
     """
     Complete fraud evaluation result for a transaction.
     Includes ensemble score, decision, SHAP explanation, and audit trail.
     """
+
     transaction_id: str
     is_fraud: bool
-    score: float              # ensemble score 0.0 – 1.0
+    score: float  # ensemble score 0.0 – 1.0
     risk_level: RiskLevel
     decision: Decision
 
@@ -270,19 +293,19 @@ class FraudResult:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "transaction_id": self.transaction_id,
-            "is_fraud":       self.is_fraud,
-            "score":          round(self.score, 4),
-            "risk_level":     self.risk_level.value,
-            "decision":       self.decision.value,
-            "reasons":        self.primary_reasons,
-            "top_features":   self.top_features,
-            "explanation":    self.explanation_text,
+            "is_fraud": self.is_fraud,
+            "score": round(self.score, 4),
+            "risk_level": self.risk_level.value,
+            "decision": self.decision.value,
+            "reasons": self.primary_reasons,
+            "top_features": self.top_features,
+            "explanation": self.explanation_text,
             "scores": {
-                "rule":  round(self.rule_score, 4),
-                "ml":    round(self.ml_score, 4),
+                "rule": round(self.rule_score, 4),
+                "ml": round(self.ml_score, 4),
                 "graph": round(self.graph_score, 4),
             },
-            "latency_ms":    round(self.latency_ms, 2),
+            "latency_ms": round(self.latency_ms, 2),
             "model_version": self.model_version,
-            "evaluated_at":  self.evaluated_at,
+            "evaluated_at": self.evaluated_at,
         }

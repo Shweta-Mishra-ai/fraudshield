@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 # ── Pathway import with graceful fallback ─────────────────────────────────
 try:
     import pathway as pw
+
     PATHWAY_AVAILABLE = True
     logger.info("Pathway %s loaded", pw.__version__)
 except ImportError:
@@ -41,22 +42,24 @@ except ImportError:
 # ── Transaction CSV schema for Pathway ───────────────────────────────────
 
 if PATHWAY_AVAILABLE:
+
     class TransactionSchema(pw.Schema):
-        transaction_id:    str
-        user_id:           str
-        amount:            float
-        currency:          str
-        timestamp:         float
-        merchant_id:       str
+        transaction_id: str
+        user_id: str
+        amount: float
+        currency: str
+        timestamp: float
+        merchant_id: str
         merchant_category: str
-        location:          str
-        device_id:         str
-        ip_address:        str
-        is_international:  bool
-        channel:           str
+        location: str
+        device_id: str
+        ip_address: str
+        is_international: bool
+        channel: str
 
 
 # ── Scoring UDF ───────────────────────────────────────────────────────────
+
 
 def _build_scorer():
     """
@@ -87,38 +90,41 @@ def _build_scorer():
         """Score one transaction — returns JSON string."""
         try:
             tx = Transaction(
-                transaction_id    = transaction_id,
-                user_id           = user_id,
-                amount            = amount,
-                currency          = currency,
-                timestamp         = timestamp,
-                merchant_id       = merchant_id,
-                merchant_category = merchant_category,
-                location          = location,
-                device_id         = device_id,
-                ip_address        = ip_address,
-                is_international  = bool(is_international),
-                channel           = channel,
+                transaction_id=transaction_id,
+                user_id=user_id,
+                amount=amount,
+                currency=currency,
+                timestamp=timestamp,
+                merchant_id=merchant_id,
+                merchant_category=merchant_category,
+                location=location,
+                device_id=device_id,
+                ip_address=ip_address,
+                is_international=bool(is_international),
+                channel=channel,
             )
             result = _detector.analyze(tx)
             return json.dumps(result.to_dict())
         except Exception as exc:
             logger.error("Pathway UDF error for tx %s: %s", transaction_id, exc)
-            return json.dumps({
-                "transaction_id": transaction_id,
-                "error": str(exc),
-                "is_fraud": False,
-                "decision": "ALLOW",
-                "score": 0.0,
-            })
+            return json.dumps(
+                {
+                    "transaction_id": transaction_id,
+                    "error": str(exc),
+                    "is_fraud": False,
+                    "decision": "ALLOW",
+                    "score": 0.0,
+                }
+            )
 
     return score_row
 
 
 # ── Main Pathway Pipeline ─────────────────────────────────────────────────
 
+
 def run_pathway_pipeline(
-    input_dir:  str = "data/transactions",
+    input_dir: str = "data/transactions",
     alerts_dir: str = "data/alerts",
     mode: str = "streaming",
 ) -> None:
@@ -142,8 +148,8 @@ def run_pathway_pipeline(
     transactions = pw.io.csv.read(
         input_dir,
         schema=TransactionSchema,
-        mode=mode,                  # "streaming" or "static"
-        autocommit_duration_ms=500, # flush every 500ms
+        mode=mode,  # "streaming" or "static"
+        autocommit_duration_ms=500,  # flush every 500ms
     )
 
     # ── 2. Score each row via UDF ─────────────────────────────────────────
@@ -165,7 +171,7 @@ def run_pathway_pipeline(
             pw.this.ip_address,
             pw.this.is_international,
             pw.this.channel,
-        )
+        ),
     )
 
     # ── 3. Filter — only high risk rows go to alerts ──────────────────────
@@ -195,9 +201,7 @@ def run_pathway_pipeline(
     )
 
     # High-risk only → alerts feed
-    high_risk = scored_with_meta.filter(
-        pw.this.fraud_score >= 0.40  # REVIEW + BLOCK
-    )
+    high_risk = scored_with_meta.filter(pw.this.fraud_score >= 0.40)  # REVIEW + BLOCK
 
     pw.io.jsonlines.write(
         high_risk,
@@ -212,6 +216,7 @@ def run_pathway_pipeline(
 
 # ── Polling Fallback (when Pathway not installed) ─────────────────────────
 
+
 def _run_polling_fallback(input_dir: str, alerts_dir: str, poll_interval: float = 2.0) -> None:
     """
     Pure Python fallback: watches input_dir for new CSV rows,
@@ -225,10 +230,10 @@ def _run_polling_fallback(input_dir: str, alerts_dir: str, poll_interval: float 
     Path(input_dir).mkdir(parents=True, exist_ok=True)
     Path(alerts_dir).mkdir(parents=True, exist_ok=True)
 
-    detector      = FraudDetector()
+    detector = FraudDetector()
     processed_ids: set = set()
-    alerts_path   = os.path.join(alerts_dir, "alerts.jsonl")
-    all_path      = os.path.join(alerts_dir, "all_scored.jsonl")
+    alerts_path = os.path.join(alerts_dir, "alerts.jsonl")
+    all_path = os.path.join(alerts_dir, "all_scored.jsonl")
 
     logger.info("Polling fallback started — watching %s every %.1fs", input_dir, poll_interval)
 
@@ -244,18 +249,19 @@ def _run_polling_fallback(input_dir: str, alerts_dir: str, poll_interval: float 
                             continue
                         try:
                             tx = Transaction(
-                                transaction_id    = tx_id,
-                                user_id           = row["user_id"],
-                                amount            = float(row["amount"]),
-                                currency          = row.get("currency", "USD"),
-                                timestamp         = float(row.get("timestamp", time.time())),
-                                merchant_id       = row["merchant_id"],
-                                merchant_category = row.get("merchant_category", "unknown"),
-                                location          = row.get("location", "US"),
-                                device_id         = row.get("device_id", "unknown"),
-                                ip_address        = row.get("ip_address", "0.0.0.0"),
-                                is_international  = row.get("is_international", "false").lower() == "true",
-                                channel           = row.get("channel", "online"),
+                                transaction_id=tx_id,
+                                user_id=row["user_id"],
+                                amount=float(row["amount"]),
+                                currency=row.get("currency", "USD"),
+                                timestamp=float(row.get("timestamp", time.time())),
+                                merchant_id=row["merchant_id"],
+                                merchant_category=row.get("merchant_category", "unknown"),
+                                location=row.get("location", "US"),
+                                device_id=row.get("device_id", "unknown"),
+                                ip_address=row.get("ip_address", "0.0.0.0"),
+                                is_international=row.get("is_international", "false").lower()
+                                == "true",
+                                channel=row.get("channel", "online"),
                             )
                             result = detector.analyze(tx)
                             result_dict = result.to_dict()
@@ -281,36 +287,49 @@ def _run_polling_fallback(input_dir: str, alerts_dir: str, poll_interval: float 
 
 # ── Transaction CSV Writer (for testing + demo) ───────────────────────────
 
+
 def write_transactions_to_csv(transactions, output_dir: str = "data/transactions") -> str:
     """Write a list of Transaction objects to CSV for Pathway to pick up."""
     import csv
+
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     filename = os.path.join(output_dir, f"batch_{int(time.time())}.csv")
 
     fieldnames = [
-        "transaction_id", "user_id", "amount", "currency", "timestamp",
-        "merchant_id", "merchant_category", "location", "device_id",
-        "ip_address", "is_international", "channel",
+        "transaction_id",
+        "user_id",
+        "amount",
+        "currency",
+        "timestamp",
+        "merchant_id",
+        "merchant_category",
+        "location",
+        "device_id",
+        "ip_address",
+        "is_international",
+        "channel",
     ]
 
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for tx in transactions:
-            writer.writerow({
-                "transaction_id":    tx.transaction_id,
-                "user_id":           tx.user_id,
-                "amount":            tx.amount,
-                "currency":          tx.currency,
-                "timestamp":         tx.timestamp,
-                "merchant_id":       tx.merchant_id,
-                "merchant_category": tx.merchant_category,
-                "location":          tx.location,
-                "device_id":         tx.device_id,
-                "ip_address":        tx.ip_address,
-                "is_international":  tx.is_international,
-                "channel":           tx.channel,
-            })
+            writer.writerow(
+                {
+                    "transaction_id": tx.transaction_id,
+                    "user_id": tx.user_id,
+                    "amount": tx.amount,
+                    "currency": tx.currency,
+                    "timestamp": tx.timestamp,
+                    "merchant_id": tx.merchant_id,
+                    "merchant_category": tx.merchant_category,
+                    "location": tx.location,
+                    "device_id": tx.device_id,
+                    "ip_address": tx.ip_address,
+                    "is_international": tx.is_international,
+                    "channel": tx.channel,
+                }
+            )
 
     logger.info("Written %d transactions to %s", len(transactions), filename)
     return filename
@@ -320,7 +339,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     mode = os.getenv("PATHWAY_MODE", "streaming")
     run_pathway_pipeline(
-        input_dir  = os.getenv("PATHWAY_INPUT_DIR", "data/transactions"),
-        alerts_dir = os.getenv("PATHWAY_ALERTS_DIR", "data/alerts"),
-        mode       = mode,
+        input_dir=os.getenv("PATHWAY_INPUT_DIR", "data/transactions"),
+        alerts_dir=os.getenv("PATHWAY_ALERTS_DIR", "data/alerts"),
+        mode=mode,
     )

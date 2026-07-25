@@ -25,7 +25,7 @@ class FraudGraphEngine:
 
     # Thresholds for ring detection
     RING_DEVICE_MIN_USERS = 3
-    RING_IP_MIN_USERS     = 5
+    RING_IP_MIN_USERS = 5
 
     # FIX (memory safety): without a cap, this graph grows forever as the
     # process stays alive — every unique device/IP/user/merchant ever seen
@@ -38,8 +38,8 @@ class FraudGraphEngine:
     def __init__(self) -> None:
         self._graph: nx.Graph = nx.Graph()
         # Reverse index: entity → set of users (faster lookups than graph traversal)
-        self._device_users:   Dict[str, Set[str]] = defaultdict(set)
-        self._ip_users:       Dict[str, Set[str]] = defaultdict(set)
+        self._device_users: Dict[str, Set[str]] = defaultdict(set)
+        self._ip_users: Dict[str, Set[str]] = defaultdict(set)
         self._merchant_users: Dict[str, Set[str]] = defaultdict(set)
         # FIFO tracking for eviction — oldest-added node keys, in order
         self._node_insertion_order: List[str] = []
@@ -60,8 +60,10 @@ class FraudGraphEngine:
 
         # ── Nodes ──────────────────────────────────────────────────────
         for node, ntype, label in [
-            (u_node, "user", tx.user_id), (d_node, "device", tx.device_id),
-            (i_node, "ip", tx.ip_address), (m_node, "merchant", tx.merchant_id),
+            (u_node, "user", tx.user_id),
+            (d_node, "device", tx.device_id),
+            (i_node, "ip", tx.ip_address),
+            (m_node, "merchant", tx.merchant_id),
         ]:
             if node not in self._graph:
                 self._graph.add_node(node, type=ntype, label=label)
@@ -70,11 +72,10 @@ class FraudGraphEngine:
         self._evict_if_over_capacity()
 
         # ── Edges (accumulate weight) ───────────────────────────────────
-        for a, b in [(u_node, d_node), (u_node, i_node), (u_node, m_node),
-                     (d_node, i_node)]:
+        for a, b in [(u_node, d_node), (u_node, i_node), (u_node, m_node), (d_node, i_node)]:
             if self._graph.has_edge(a, b):
                 self._graph[a][b]["weight"] += tx.amount
-                self._graph[a][b]["count"]  += 1
+                self._graph[a][b]["count"] += 1
             else:
                 self._graph.add_edge(a, b, weight=tx.amount, count=1)
 
@@ -95,7 +96,7 @@ class FraudGraphEngine:
                 continue
             ntype = self._graph.nodes[old_node].get("type")
             label = self._graph.nodes[old_node].get("label")
-            self._graph.remove_node(old_node)   # also removes its edges
+            self._graph.remove_node(old_node)  # also removes its edges
 
             # Clean up reverse indices too
             if ntype == "device" and label in self._device_users:
@@ -106,8 +107,7 @@ class FraudGraphEngine:
                 del self._merchant_users[label]
 
         logger.info(
-            "Graph memory cap: evicted %d oldest nodes (limit=%d)",
-            overflow, self.MAX_GRAPH_NODES
+            "Graph memory cap: evicted %d oldest nodes (limit=%d)", overflow, self.MAX_GRAPH_NODES
         )
 
     # ──────────────────────────────────────────────────────────────────────
@@ -120,15 +120,15 @@ class FraudGraphEngine:
         High score = this device or IP is shared with many OTHER users.
         """
         device_users = self._device_users.get(device_id, set())
-        ip_users     = self._ip_users.get(ip_address, set())
+        ip_users = self._ip_users.get(ip_address, set())
 
         other_device_users = len(device_users - {user_id})
-        other_ip_users     = len(ip_users - {user_id})
+        other_ip_users = len(ip_users - {user_id})
 
         # Normalize: 9+ other users on same device → score 1.0
         device_score = min(other_device_users / 9.0, 1.0) if other_device_users > 0 else 0.0
         # Normalize: 14+ other users on same IP → score 1.0
-        ip_score     = min(other_ip_users     / 14.0, 1.0) if other_ip_users > 0 else 0.0
+        ip_score = min(other_ip_users / 14.0, 1.0) if other_ip_users > 0 else 0.0
 
         return round(max(device_score, ip_score), 4)
 
@@ -146,26 +146,30 @@ class FraudGraphEngine:
         # ── Device rings ────────────────────────────────────────────────
         for device, users in self._device_users.items():
             if len(users) >= self.RING_DEVICE_MIN_USERS:
-                rings.append({
-                    "type":       "shared_device",
-                    "entity":     device,
-                    "users":      list(users),
-                    "user_count": len(users),
-                    "risk_score": min(len(users) / 10.0, 1.0),
-                    "reason":     f"Device shared by {len(users)} users",
-                })
+                rings.append(
+                    {
+                        "type": "shared_device",
+                        "entity": device,
+                        "users": list(users),
+                        "user_count": len(users),
+                        "risk_score": min(len(users) / 10.0, 1.0),
+                        "reason": f"Device shared by {len(users)} users",
+                    }
+                )
 
         # ── IP rings ────────────────────────────────────────────────────
         for ip, users in self._ip_users.items():
             if len(users) >= self.RING_IP_MIN_USERS:
-                rings.append({
-                    "type":       "shared_ip",
-                    "entity":     ip,
-                    "users":      list(users),
-                    "user_count": len(users),
-                    "risk_score": min(len(users) / 15.0, 1.0),
-                    "reason":     f"IP used by {len(users)} different users",
-                })
+                rings.append(
+                    {
+                        "type": "shared_ip",
+                        "entity": ip,
+                        "users": list(users),
+                        "user_count": len(users),
+                        "risk_score": min(len(users) / 15.0, 1.0),
+                        "reason": f"IP used by {len(users)} different users",
+                    }
+                )
 
         # Sort by risk descending
         rings.sort(key=lambda r: r["risk_score"], reverse=True)
@@ -201,9 +205,9 @@ class FraudGraphEngine:
 
         nodes = [
             {
-                "id":    n,
+                "id": n,
                 "label": sub.nodes[n].get("label", n),
-                "type":  sub.nodes[n].get("type", "unknown"),
+                "type": sub.nodes[n].get("type", "unknown"),
                 "color": color_map.get(sub.nodes[n].get("type", ""), "#ccc"),
             }
             for n in sub.nodes()
@@ -213,7 +217,7 @@ class FraudGraphEngine:
                 "source": e[0],
                 "target": e[1],
                 "weight": round(e[2].get("weight", 1), 2),
-                "count":  e[2].get("count", 1),
+                "count": e[2].get("count", 1),
             }
             for e in sub.edges(data=True)
         ]
@@ -222,10 +226,10 @@ class FraudGraphEngine:
     def get_stats(self) -> Dict:
         user_nodes = [n for n, d in self._graph.nodes(data=True) if d.get("type") == "user"]
         return {
-            "total_nodes":          self._graph.number_of_nodes(),
-            "total_edges":          self._graph.number_of_edges(),
-            "unique_users":         len(user_nodes),
-            "unique_devices":       len(self._device_users),
-            "unique_ips":           len(self._ip_users),
+            "total_nodes": self._graph.number_of_nodes(),
+            "total_edges": self._graph.number_of_edges(),
+            "unique_users": len(user_nodes),
+            "unique_devices": len(self._device_users),
+            "unique_ips": len(self._ip_users),
             "connected_components": nx.number_connected_components(self._graph),
         }
