@@ -1,0 +1,51 @@
+# FraudShield — Render deployment config (monorepo-aware)
+#
+# `rootDir: apps/api` is set ONCE here. Adding new features anywhere
+# inside apps/api/ (new routes, new rules, new ML models, etc.) never
+# requires touching this file again — Render always builds from the
+# same subdirectory using the same Dockerfile path relative to it.
+#
+# IMPORTANT: Pathway streaming runs IN-PROCESS as a background thread
+# inside this one web service (see apps/api/src/api/main.py's lifespan
+# handler) — NOT as a separate worker service. Render's free tier does
+# not share a filesystem between separate services, so a second
+# "worker" service would never actually see the CSV files this API
+# writes. Running everything in one process guarantees they share the
+# same local disk.
+
+services:
+  - type: web
+    name: fraudshield-api
+    runtime: docker
+    rootDir: apps/api
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/v2/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ENABLE_DOCS
+        value: "true"           # set "false" once you have real customers
+      - key: ENABLE_PATHWAY_THREAD
+        value: "true"
+      - key: PATHWAY_MODE
+        value: streaming
+      - key: PATHWAY_INPUT_DIR
+        value: data/transactions
+      - key: PATHWAY_ALERTS_DIR
+        value: data/alerts
+      - key: DB_PATH
+        value: data/fraud.db
+      - key: BATCH_SIZE_LIMIT
+        value: "100"
+      - key: RATE_LIMIT
+        value: "100"
+      # Set these manually in the Render dashboard — never commit real secrets!
+      - key: API_KEYS
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false   # e.g. https://fraudshield-web.vercel.app

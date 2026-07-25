@@ -1,0 +1,119 @@
+name: API CI
+
+# FIX (scalable monorepo CI): path filters mean this workflow only runs
+# when apps/api/ actually changes. Adding a new feature to apps/web/
+# never triggers a backend test run, and vice versa. This is what lets
+# the two apps evolve independently inside one repo without slowing
+# each other down or requiring the repo to be split apart later.
+on:
+  push:
+    branches: [main, "production-*", "feature/**"]
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/api-ci.yml"
+
+defaults:
+  run:
+    working-directory: apps/api
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff black
+      - run: ruff check src/ config/ tests/ --select=E,W,F --ignore=E501
+      - run: black --check src/ config/ --line-length=100 || true
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('apps/api/requirements.txt') }}
+      - run: pip install --upgrade pip && pip install -r requirements.txt
+      - run: python run_tests.py
+        env:
+          ENVIRONMENT: development
+      - run: pytest tests/ -v --cov=src --cov-report=xml --cov-report=term-missing
+        env:
+          ENVIRONMENT: development
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-coverage-${{ matrix.python-version }}
+          path: apps/api/coverage.xml
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt --desc || true
+
+  load-test:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: |
+          python -c "
+          import sys, time
+          sys.path.insert(0, '.')
+          from src.core.detector import FraudDetector
+          from src.core.generator import TransactionGenerator
+
+          det = FraudDetector()
+          gen = TransactionGenerator(n_users=100, n_merchants=30)
+          crashes = 0
+          t0 = time.time()
+          for t in gen.generate_batch(1000):
+              try:
+                  r = det.analyze(t)
+                  assert 0.0 <= r.score <= 1.0
+                  assert r.latency_ms < 1000
+              except Exception as e:
+                  crashes += 1
+                  print(f'CRASH: {e}')
+          elapsed = time.time() - t0
+          print(f'{1000/elapsed:.0f} tx/sec, {crashes} crashes')
+          assert crashes == 0
+          "
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t fraudshield-api:ci-test apps/api
+      - run: |
+          docker run -d -p 8000:8000 \
+            -e ENVIRONMENT=development \
+            -e API_KEYS=ci-test-key \
+            -e JWT_SECRET=ci-test-secret-minimum-32-characters-long \
+            --name test-container fraudshield-api:ci-test
+          sleep 8
+          curl -f http://localhost:8000/api/v2/health || (docker logs test-container && exit 1)
+          docker stop test-container

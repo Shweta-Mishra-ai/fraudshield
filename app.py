@@ -1,12 +1,16 @@
+"""
+FraudShield Real-Time Fraud Pathway — Top-Level Application Entrypoint
+
+Supports running the Streamlit Dashboard directly:
+    streamlit run app.py
+"""
 import os
 import sys
 
-# Ensure the root directory and dashboard directory are in the Python search path
-root_dir = os.path.dirname(os.path.abspath(__file__))
-if root_dir not in sys.path:
-    sys.path.insert(0, root_dir)
+# Insert apps/api into Python path
+api_path = os.path.join(os.path.dirname(__file__), "apps", "api")
+if api_path not in sys.path:
+    sys.path.insert(0, api_path)
 
-# Read and execute the modular dashboard app
-dashboard_path = os.path.join(root_dir, "dashboard", "app.py")
-with open(dashboard_path, "r", encoding="utf-8") as f:
-    exec(f.read(), globals())
+# Execute the Streamlit Dashboard app
+from apps.api.dashboard.app import *
