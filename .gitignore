@@ -39,3 +39,11 @@ htmlcov/
 .vscode/
 .idea/
 .gemini/
+
+# Virtual environments and local Python config
+venv/
+ENV/
+env/
+.venv/
+.python-version
+.env
