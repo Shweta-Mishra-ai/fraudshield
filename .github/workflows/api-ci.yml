@@ -10,11 +10,15 @@ on:
     branches: [main, "production-*", "feature/**"]
     paths:
       - "apps/api/**"
+      - "requirements.txt"
+      - "Makefile"
       - ".github/workflows/api-ci.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/api/**"
+      - "requirements.txt"
+      - "Makefile"
       - ".github/workflows/api-ci.yml"
 
 defaults:

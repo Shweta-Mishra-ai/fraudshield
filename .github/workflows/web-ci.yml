@@ -7,11 +7,15 @@ on:
     branches: [main, "production-*", "feature/**"]
     paths:
       - "apps/web/**"
+      - "package.json"
+      - "vercel.json"
       - ".github/workflows/web-ci.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/web/**"
+      - "package.json"
+      - "vercel.json"
       - ".github/workflows/web-ci.yml"
 
 defaults:
