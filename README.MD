@@ -7,11 +7,22 @@
 [![Pathway](https://img.shields.io/badge/Pathway-Streaming%20Engine-7C3AED.svg)](https://pathway.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-178%20Passed-brightgreen.svg)]()
-[![Version](https://img.shields.io/badge/Version-v1.0.0-blue.svg)]()
+[![GitHub Stars](https://img.shields.io/github/stars/Shweta-Mishra-ai/realtime-fraud-pathway?style=social)](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway)
 
 **FraudShield Real-Time** is an enterprise-grade, high-throughput fraud detection platform powered by **Pathway** real-time streaming pipelines, an **ML Ensemble (XGBoost + Isolation Forest)**, a **Dynamic 9-Rule Engine**, and a **User-Device-IP Graph Ring Analytics Engine**.
 
 Designed to evaluate credit card and digital transaction streams with **sub-millisecond latency (<1ms evaluation per transaction)**, FraudShield provides dual monitoring command centers: a **Streamlit Live Control Center** and a modern **Next.js 14 Web Application**.
+
+> 🌟 **If you find FraudShield helpful or interesting, please give it a ⭐ Star on GitHub — it helps the project grow!**
+
+---
+
+## 📚 Quick Documentation Links
+
+- 📖 **[Detailed Setup & Installation Guide](SETUP_GUIDE.md)** — Step-by-step local & production installation.
+- 🤝 **[Contribution Guidelines](CONTRIBUTING.md)** — Code standards, PR checklist, and branch workflows.
+- 📊 **[Real-Time Benchmark Report](DEMO_OUTPUT.md)** — Live execution latency & fraud detection metrics.
+- 📐 **[System Architecture Guide](docs/ARCHITECTURE.md)** — In-depth architectural blueprint.
 
 ---
 
@@ -139,6 +150,8 @@ realtime-fraud-pathway/
 ├── app.py                      # Top-level Streamlit entrypoint
 ├── generate_demo_output.py     # Demo benchmark generator
 ├── requirements.txt            # Master Python dependencies
+├── SETUP_GUIDE.md              # Detailed step-by-step setup guide
+├── CONTRIBUTING.md             # Open-source contribution guidelines
 ├── Makefile                    # Automation commands (test, run, build)
 ├── render.yaml                 # Deployment blueprint for Render
 ├── vercel.json                 # Deployment configuration for Vercel
@@ -166,6 +179,8 @@ realtime-fraud-pathway/
 ---
 
 ## 🚀 Quickstart Guide
+
+For a full step-by-step guide, read the **[SETUP_GUIDE.md](SETUP_GUIDE.md)**.
 
 ### 1. Prerequisites
 - Python 3.10+
@@ -236,6 +251,14 @@ npm run build
 | `POST` | `/api/v2/alerts/{id}/review` | Submit analyst review (Approve/Reject) | Yes (`X-API-Key`) |
 | `GET` | `/api/v2/stats` | Fetch real-time system throughput & fraud metrics | Yes (`X-API-Key`) |
 | `GET` | `/api/v2/health` | Health check endpoint | No |
+
+---
+
+## ⭐ Support & Community
+
+If you find FraudShield useful, please consider **giving a star ⭐ on GitHub**!
+
+[![Star on GitHub](https://img.shields.io/github/stars/Shweta-Mishra-ai/realtime-fraud-pathway?style=for-the-badge&logo=github&color=gold)](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway)
 
 ---
 
