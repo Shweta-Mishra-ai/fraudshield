@@ -19,6 +19,7 @@ Designed to evaluate credit card and digital transaction streams with **sub-mill
 
 ## 📚 Quick Documentation Links
 
+- 📘 **[System Overview & Maintenance Guide (DOCUMENTATION.md)](DOCUMENTATION.md)** — What FraudShield is, computer maintenance, & school computer specs.
 - 📖 **[Detailed Setup & Installation Guide (SETUP_GUIDE.md)](SETUP_GUIDE.md)** — Step-by-step local, Docker, & production deployment guide.
 - 🤝 **[Contribution Guidelines (CONTRIBUTING.md)](CONTRIBUTING.md)** — Code standards, PR checklist, and development workflow.
 - 📊 **[Real-Time Benchmark Report (DEMO_OUTPUT.md)](DEMO_OUTPUT.md)** — Live execution latency & fraud detection metrics.
