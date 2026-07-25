@@ -2,7 +2,7 @@
 
 **Next.js frontend for FraudShield.** Public landing page with an interactive fraud-detection demonstration, Supabase-backed authentication, and a self-service dashboard where users generate API keys and test the fraud API immediately.
 
-[![Web CI](https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway/actions/workflows/web-ci.yml/badge.svg)](../../.github/workflows/web-ci.yml)
+[![Web CI](https://github.com/Shweta-Mishra-ai/fraudshield/actions/workflows/web-ci.yml/badge.svg)](../../.github/workflows/web-ci.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.35-black)](package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](tsconfig.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
@@ -81,8 +81,8 @@ This app lives at `apps/web` in the [FraudShield monorepo](../../README.md) alon
 ### Install & Run
 
 ```bash
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway/apps/web
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield/apps/web
 
 npm install
 cp .env.example .env.local   # fill in your Supabase + API values

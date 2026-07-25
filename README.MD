@@ -7,22 +7,48 @@
 [![Pathway](https://img.shields.io/badge/Pathway-Streaming%20Engine-7C3AED.svg)](https://pathway.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-178%20Passed-brightgreen.svg)]()
-[![Version](https://img.shields.io/badge/Version-v1.0.0-blue.svg)]()
+[![GitHub Stars](https://img.shields.io/github/stars/Shweta-Mishra-ai/fraudshield?style=social)](https://github.com/Shweta-Mishra-ai/fraudshield)
 
 **FraudShield Real-Time** is an enterprise-grade, high-throughput fraud detection platform powered by **Pathway** real-time streaming pipelines, an **ML Ensemble (XGBoost + Isolation Forest)**, a **Dynamic 9-Rule Engine**, and a **User-Device-IP Graph Ring Analytics Engine**.
 
 Designed to evaluate credit card and digital transaction streams with **sub-millisecond latency (<1ms evaluation per transaction)**, FraudShield provides dual monitoring command centers: a **Streamlit Live Control Center** and a modern **Next.js 14 Web Application**.
 
+> 🌟 **Enjoying FraudShield? Please give this repository a ⭐ Star on GitHub — it helps the project grow and reach more developers!**
+
 ---
 
-## 📐 System Architecture
+## 📚 Quick Documentation Links
 
-### Visual Architectural Overview
+- 📘 **[System Overview & Maintenance Guide (DOCUMENTATION.md)](DOCUMENTATION.md)** — What FraudShield is, computer maintenance, & school computer specs.
+- 📖 **[Detailed Setup & Installation Guide (SETUP_GUIDE.md)](SETUP_GUIDE.md)** — Step-by-step local, Docker, & production deployment guide.
+- 🤝 **[Contribution Guidelines (CONTRIBUTING.md)](CONTRIBUTING.md)** — Code standards, PR checklist, and development workflow.
+- 📊 **[Real-Time Benchmark Report (DEMO_OUTPUT.md)](DEMO_OUTPUT.md)** — Live execution latency & fraud detection metrics.
+- 📐 **[System Architecture Guide (docs/ARCHITECTURE.md)](docs/ARCHITECTURE.md)** — In-depth technical architecture blueprint.
+
+---
+
+## 📋 Table of Contents
+
+1. [System Architecture & Dataflow](#-system-architecture--dataflow)
+2. [Core Features](#-core-features)
+3. [Repository Directory Structure](#-repository-directory-structure)
+4. [Step-by-Step Setup Guide](#-step-by-step-setup-guide)
+5. [Step-by-Step Contribution Workflow](#-step-by-step-contribution-workflow)
+6. [Local Testing & Verification](#-local-testing--verification)
+7. [REST API Endpoint Reference](#-rest-api-endpoint-reference)
+8. [Support & Give a Star](#-support--give-a-star)
+9. [License & Versioning](#-license--versioning)
+
+---
+
+## 📐 System Architecture & Dataflow
+
+### Visual System Architecture Diagram
 ![FraudShield System Architecture](docs/assets/architecture.svg)
 
 ---
 
-### 🔄 End-to-End Streaming Sequence
+### 🔄 End-to-End Real-Time Streaming Sequence
 
 ```mermaid
 sequenceDiagram
@@ -64,7 +90,7 @@ sequenceDiagram
 
 ---
 
-### 🧩 Component Dependency Flow
+### 🧩 Component Dependency Flowchart
 
 ```mermaid
 flowchart TD
@@ -115,7 +141,7 @@ flowchart TD
 
 ---
 
-## ✨ Key Features
+## ✨ Core Features
 
 - **⚡ Sub-Millisecond Evaluation**: Benchmarked at `<0.3ms` evaluation latency per transaction.
 - **🌊 Pathway Streaming Integration**: Real-time sliding window aggregates (1h/24h transaction counts, sums, velocity) with automated polling engine fallback on non-Linux environments.
@@ -126,19 +152,21 @@ flowchart TD
 - **🔒 Enterprise Security**:
   - Automatic **SHA-256 PII Hashing** for IP addresses and device IDs before storage.
   - Built-in **Rate Limiting (HTTP 429)**, API Key Verification, and strict security headers (`X-Frame-Options`, `X-Content-Type-Options`, CSP).
-- **🖥️ Dual Dashboards**:
+- **🖥️ Dual Command Center Dashboards**:
   - **Streamlit Live Simulator & Command Center** (`streamlit run app.py`).
   - **Next.js 14 Web Application** with Tailwind CSS (`cd apps/web && npm run dev`).
 
 ---
 
-## 📂 Project Repository Structure
+## 📂 Repository Directory Structure
 
 ```
-realtime-fraud-pathway/
+fraudshield/
 ├── app.py                      # Top-level Streamlit entrypoint
 ├── generate_demo_output.py     # Demo benchmark generator
 ├── requirements.txt            # Master Python dependencies
+├── SETUP_GUIDE.md              # Complete step-by-step setup guide
+├── CONTRIBUTING.md             # Open-source contribution guidelines
 ├── Makefile                    # Automation commands (test, run, build)
 ├── render.yaml                 # Deployment blueprint for Render
 ├── vercel.json                 # Deployment configuration for Vercel
@@ -165,69 +193,117 @@ realtime-fraud-pathway/
 
 ---
 
-## 🚀 Quickstart Guide
+## ⚙️ Step-by-Step Setup Guide
 
-### 1. Prerequisites
-- Python 3.10+
-- Node.js 18+ (for Next.js web application)
+For full instructions, read the dedicated **[SETUP_GUIDE.md](SETUP_GUIDE.md)**.
 
-### 2. Environment Setup & Installation
+### Step 1: Clone Repository & Create Virtual Environment
 ```bash
-# Clone the repository
-git clone https://github.com/Shweta-Mishra-ai/realtime-fraud-pathway.git
-cd realtime-fraud-pathway
+git clone https://github.com/Shweta-Mishra-ai/fraudshield.git
+cd fraudshield
 
-# Install Python backend dependencies
-pip install -r requirements.txt
+# Create Python virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Linux/macOS:
+source venv/bin/activate
+# On Windows PowerShell:
+.\venv\Scripts\Activate.ps1
 ```
 
----
+### Step 2: Install Python & Node Dependencies
+```bash
+# Install backend dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
 
-### 3. Launching the Services
+# Install frontend dependencies
+cd apps/web
+npm install
+cd ../..
+```
 
-#### Option A: Streamlit Live Simulator & Command Center
+### Step 3: Launch Services
+
+#### Launch Option 1: Streamlit Command Center
 ```bash
 streamlit run app.py
 ```
-*Access the Streamlit Dashboard at `http://localhost:8501`*
+*Access in browser: **[http://localhost:8501](http://localhost:8501)** *
 
-#### Option B: FastAPI Backend REST Server
+#### Launch Option 2: FastAPI Backend API Server
 ```bash
 python -m uvicorn apps.api.src.api.main:app --reload --port 8000
 ```
-*API Documentation available at `http://localhost:8000/docs`*
+*Swagger API Docs: **[http://localhost:8000/docs](http://localhost:8000/docs)** *
 
-#### Option C: Next.js 14 Web Application
+#### Launch Option 3: Next.js 14 Web Application
 ```bash
 cd apps/web
-npm install
 npm run dev
 ```
-*Access the Next.js Web App at `http://localhost:3000`*
+*Access in browser: **[http://localhost:3000](http://localhost:3000)** *
+
+---
+
+## 🤝 Step-by-Step Contribution Workflow
+
+For complete contribution guidelines, read the **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+
+### Step 1: Create a Feature Branch
+```bash
+git checkout -b feat/your-feature-name
+```
+
+### Step 2: Format Code & Lint
+Maintain strict formatting before committing:
+
+```bash
+# Format Python Backend
+cd apps/api
+black src/ config/ tests/ --line-length=100
+ruff check src/ config/ tests/ --select=E,W,F --ignore=E501
+
+# Typecheck Frontend
+cd apps/web
+npx tsc --noEmit
+```
+
+### Step 3: Run Automated Tests
+```bash
+# Python Backend Test Suite (178 tests)
+python apps/api/run_tests.py
+pytest apps/api/tests
+
+# Next.js Production Build Test
+cd apps/web
+npm run build
+```
+
+### Step 4: Open a Pull Request
+Push your branch and open a PR targeting the `main` branch. Ensure your PR title follows conventional commits (`feat:`, `fix:`, `docs:`, `refactor:`).
 
 ---
 
 ## 🧪 Local Testing & Verification
 
-Run the full Python test suite (178 unit & integration tests):
+Execute all test suites locally:
 
 ```bash
-# Master Test Runner (no external dependencies required)
+# Run Master Test Runner
 python apps/api/run_tests.py
 
-# Or via pytest
+# Run Pytest Integration & Security Tests
 pytest apps/api/tests
-```
 
-Validate Next.js Build:
-```bash
-cd apps/web
-npm run build
+# Generate Benchmark Report
+python generate_demo_output.py
 ```
 
 ---
 
-## 📡 API Reference Table
+## 📡 REST API Endpoint Reference
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :---: |
@@ -236,6 +312,18 @@ npm run build
 | `POST` | `/api/v2/alerts/{id}/review` | Submit analyst review (Approve/Reject) | Yes (`X-API-Key`) |
 | `GET` | `/api/v2/stats` | Fetch real-time system throughput & fraud metrics | Yes (`X-API-Key`) |
 | `GET` | `/api/v2/health` | Health check endpoint | No |
+
+---
+
+## ⭐ Support & Give a Star
+
+If you find FraudShield helpful, inspiring, or useful for your projects, please take a second to **give it a Star ⭐ on GitHub**! Your support motivates continuous improvement and open-source contributions.
+
+<p align="center">
+  <a href="https://github.com/Shweta-Mishra-ai/fraudshield">
+    <img src="https://img.shields.io/github/stars/Shweta-Mishra-ai/fraudshield?style=for-the-badge&logo=github&color=gold" alt="Give a Star on GitHub"/>
+  </a>
+</p>
 
 ---
 

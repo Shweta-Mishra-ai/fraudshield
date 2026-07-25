@@ -55,6 +55,17 @@ def valid_tx_payload(**overrides) -> dict:
 
 
 class TestHealthEndpoint:
+    def test_root_endpoint(self, client):
+        r = client.get("/")
+        assert r.status_code == 200
+        data = r.json()
+        assert data["status"] == "online"
+        assert "version" in data
+
+    def test_root_head_endpoint(self, client):
+        r = client.head("/")
+        assert r.status_code == 200
+
     def test_health_no_auth_required(self, client):
         r = client.get("/api/v2/health")
         assert r.status_code == 200
