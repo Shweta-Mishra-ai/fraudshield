@@ -107,7 +107,7 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t fraudshield-api:ci-test apps/api
+      - run: docker build -t fraudshield-api:ci-test .
       - run: |
           docker run -d -p 8000:8000 \
             -e ENVIRONMENT=development \
