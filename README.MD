@@ -6,7 +6,7 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.31%2B-FF4B4B.svg)](https://streamlit.io/)
 [![Pathway](https://img.shields.io/badge/Pathway-Streaming%20Engine-7C3AED.svg)](https://pathway.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-178%20Passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-180%20Passed-brightgreen.svg)]()
 [![GitHub Stars](https://img.shields.io/github/stars/Shweta-Mishra-ai/fraudshield?style=social)](https://github.com/Shweta-Mishra-ai/fraudshield)
 
 **FraudShield Real-Time** is an enterprise-grade, high-throughput fraud detection platform powered by **Pathway** real-time streaming pipelines, an **ML Ensemble (XGBoost + Isolation Forest)**, a **Dynamic 9-Rule Engine**, and a **User-Device-IP Graph Ring Analytics Engine**.
@@ -14,6 +14,17 @@
 Designed to evaluate credit card and digital transaction streams with **sub-millisecond latency (<1ms evaluation per transaction)**, FraudShield provides dual monitoring command centers: a **Streamlit Live Control Center** and a modern **Next.js 14 Web Application**.
 
 > 🌟 **Enjoying FraudShield? Please give this repository a ⭐ Star on GitHub — it helps the project grow and reach more developers!**
+
+---
+
+## 🚀 Live Deployments
+
+| Platform | URL | Description |
+|----------|-----|-------------|
+| 🌐 **Next.js Web App** | [fraudshield-blue-seven.vercel.app](https://fraudshield-blue-seven.vercel.app/) | Full landing page + live fraud demo |
+| 📊 **Streamlit Dashboard** | [realtime-fraud-pathway-yk6vymdmgdfsue6lbappytf.streamlit.app](https://realtime-fraud-pathway-yk6vymdmgdfsue6lbappytf.streamlit.app/) | Live analytics & control center |
+| ⚙️ **FastAPI Backend** | [fraudshield-hmas.onrender.com](https://fraudshield-hmas.onrender.com/) | REST API + Swagger Docs (`/docs`) |
+| 📖 **API Docs (Swagger)** | [fraudshield-hmas.onrender.com/docs](https://fraudshield-hmas.onrender.com/docs) | Interactive API reference |
 
 ---
 

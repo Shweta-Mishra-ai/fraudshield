@@ -448,55 +448,58 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Free while in beta
+              100% Free &amp; Open Source
             </h2>
             <p className="text-slate-400 text-lg">
-              No credit card. No limits for first 100 users.
+              No credit card. No sign-up required. Deploy it yourself.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                name:  'Beta (Now)',
+                name:  'Live Demo',
                 price: 'Free',
-                sub:   'For first 100 users',
+                sub:   'Try it right now — no setup',
                 features: [
-                  'Unlimited API calls',
-                  'Full ML ensemble',
-                  'Graph fraud detection',
-                  'Analyst dashboard',
-                  'Email support',
+                  'Live fraud detection demo',
+                  'Full ML ensemble scoring',
+                  'Graph fraud ring detection',
+                  'Streamlit analytics dashboard',
+                  'FastAPI Swagger docs',
                 ],
-                cta:   'Get Started Free',
+                cta:   'Try Live Demo',
+                href:  '#demo',
                 highlight: true,
               },
               {
-                name:  'Starter',
-                price: '$29',
-                sub:   '/month — coming soon',
+                name:  'Self-Host',
+                price: 'Free',
+                sub:   'Deploy on your own infra',
                 features: [
-                  '50,000 transactions/mo',
-                  'All ML features',
-                  'Webhook alerts',
-                  'Priority support',
-                  'Usage analytics',
+                  'Full source code on GitHub',
+                  'Docker + Render ready',
+                  'Unlimited transactions',
+                  'Custom rules & thresholds',
+                  'MIT License',
                 ],
-                cta:   'Join Waitlist',
+                cta:   'View on GitHub',
+                href:  'https://github.com/Shweta-Mishra-ai/fraudshield',
                 highlight: false,
               },
               {
-                name:  'Pro',
-                price: '$99',
-                sub:   '/month — coming soon',
+                name:  'Contribute',
+                price: 'Open',
+                sub:   'Source',
                 features: [
-                  '500,000 transactions/mo',
-                  'Custom rules',
-                  'Dedicated support',
-                  'SLA guarantee',
-                  'White-label option',
+                  'Fork & improve freely',
+                  '180 tests included',
+                  'CI/CD GitHub Actions',
+                  'Full documentation',
+                  'PRs welcome!',
                 ],
-                cta:   'Join Waitlist',
+                cta:   'Star on GitHub ⭐',
+                href:  'https://github.com/Shweta-Mishra-ai/fraudshield',
                 highlight: false,
               },
             ].map((plan, i) => (
@@ -506,7 +509,7 @@ export default function LandingPage() {
                   : 'border-dark-600 bg-dark-800'
               }`}>
                 {plan.highlight && (
-                  <div className="badge-blue mb-3 inline-block">Most Popular</div>
+                  <div className="badge-blue mb-3 inline-block">📊 Live Now</div>
                 )}
                 <h3 className="text-lg font-bold mb-1">{plan.name}</h3>
                 <div className="text-3xl font-bold mb-1">{plan.price}</div>
@@ -521,8 +524,8 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.highlight ? '/auth/signup' : '/auth/signup'}
+                <a
+                  href={plan.href}
                   className={`block text-center py-2.5 rounded-lg font-medium
                     text-sm transition-all duration-200 ${
                     plan.highlight
@@ -530,7 +533,7 @@ export default function LandingPage() {
                       : 'bg-dark-700 hover:bg-dark-600 text-slate-300 border border-dark-600'
                   }`}>
                   {plan.cta}
-                </Link>
+                </a>
               </div>
             ))}
           </div>
