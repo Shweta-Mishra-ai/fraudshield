@@ -37,17 +37,38 @@ API_URL = os.getenv("API_URL", "https://fraudshield-hmas.onrender.com")
 API_KEY = os.getenv("API_KEY", "dev-key-change-in-prod")
 HEADERS = {"X-API-Key": API_KEY, "Content-Type": "application/json"}
 
+# Render free tier sleeps after 15 min inactivity — wake-up takes ~30-60s.
+_RENDER_FREE = "onrender.com" in API_URL
+
+
+def _wake_up_render() -> bool:
+    """Ping the root endpoint once to wake Render's free-tier container.
+    Returns True if the API came online within 60s."""
+    for attempt in range(6):          # 6 × 10s = 60s max wait
+        try:
+            r = requests.get(f"{API_URL}/", timeout=12)
+            if r.status_code < 500:
+                return True
+        except Exception:
+            pass
+        time.sleep(10)
+    return False
+
 
 def api_get(path: str, params: dict = None) -> dict | list | None:
     try:
         r = requests.get(f"{API_URL}{path}", headers=HEADERS,
-                         params=params, timeout=10)
+                         params=params, timeout=35)
         if r.status_code == 200:
             return r.json()
+        # Render free tier: 502/503 on cold start — wake it up silently
+        if _RENDER_FREE and r.status_code in (502, 503):
+            return None
         st.error(f"API error {r.status_code}: {r.text[:200]}")
         return None
     except requests.exceptions.ConnectionError:
-        st.error(f"Cannot connect to API at {API_URL}. Is it running?")
+        return None   # handled in sidebar with wake-up notice
+    except requests.exceptions.Timeout:
         return None
     except Exception as e:
         st.error(f"API call failed: {e}")
@@ -57,9 +78,12 @@ def api_get(path: str, params: dict = None) -> dict | list | None:
 def api_post(path: str, data: dict | list) -> dict | None:
     try:
         r = requests.post(f"{API_URL}{path}", headers=HEADERS,
-                          json=data, timeout=15)
+                          json=data, timeout=35)
         if r.status_code == 200:
             return r.json()
+        if _RENDER_FREE and r.status_code in (502, 503):
+            st.warning("⏳ API is waking up (Render free tier). Try again in 30s.")
+            return None
         st.error(f"API error {r.status_code}: {r.text[:200]}")
         return None
     except Exception as e:
@@ -115,6 +139,7 @@ with st.sidebar:
 
     st.divider()
     st.markdown("### 🔗 API Connection")
+    st.caption(f"🌐 `{API_URL}`")
     health = api_get("/api/v2/health")
     if health:
         st.success(f"✅ Connected — v{health.get('version','?')}")
@@ -122,15 +147,19 @@ with st.sidebar:
         st.metric("XGBoost",  "✅" if health.get("xgb_trained") else "⏳")
         st.metric("IsoForest","✅" if health.get("iso_warm")    else "⏳")
     else:
-        st.error("❌ API not reachable")
+        st.warning("⏳ API waking up (Render free tier)...\n\nPlease wait ~30s and refresh the page.")
+        st.info("💡 Render free tier sleeps after 15 min of inactivity. First request wakes it up!")
 
     st.divider()
     st.markdown("### 🔍 User Lookup")
     user_search = st.text_input("User ID", placeholder="USER_0001")
 
     st.divider()
-    st.markdown(f"[📖 API Docs]({API_URL}/docs)")
-    st.markdown(f"[❤️ Health]({API_URL}/api/v2/health)")
+    st.markdown("### 🔗 Live Links")
+    st.markdown(f"[📖 API Docs ↗]({API_URL}/docs)")
+    st.markdown(f"[❤️ Health Check ↗]({API_URL}/api/v2/health)")
+    st.markdown("[⭐ GitHub ↗](https://github.com/Shweta-Mishra-ai/fraudshield)")
+    st.markdown("[🌐 Web App ↗](https://fraudshield-blue-seven.vercel.app)")
 
 
 # ── Header ────────────────────────────────────────────────────────────────
