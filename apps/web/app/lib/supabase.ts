@@ -24,11 +24,17 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
-  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  const origin = typeof window !== 'undefined'
+    ? window.location.origin
+    : 'https://fraudshield-blue-seven.vercel.app'
+  const redirectTarget = origin.includes('localhost')
+    ? 'http://localhost:3000/dashboard'
+    : 'https://fraudshield-blue-seven.vercel.app/dashboard'
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${origin}/dashboard`
+      redirectTo: redirectTarget
     }
   })
   return { data, error }
