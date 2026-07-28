@@ -219,13 +219,13 @@ export default function LandingPage() {
             <div className="flex items-center gap-3">
               <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
                 target="_blank" rel="noopener noreferrer"
-                className="text-sm text-slate-400 hover:text-white transition-colors">
+                className="hidden sm:inline-flex text-sm text-slate-400 hover:text-white transition-colors">
                 ⭐ GitHub
               </a>
-              <a href="#demo"
+              <Link href="/auth/signup"
                 className="btn-primary text-sm py-2 px-4">
-                Try Demo <ChevronRight className="w-4 h-4" />
-              </a>
+                Get Free API Key <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </div>
@@ -237,7 +237,7 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full
             bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm mb-6">
             <Zap className="w-3.5 h-3.5" />
-            Open Source · MIT License · 180 Tests Passing
+            100% Open Source · MIT License · 180 Tests Passing
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -248,18 +248,22 @@ export default function LandingPage() {
           <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             Open-source fraud detection platform for fintech, e-commerce, and payments.
             3-layer ensemble: Rule Engine + XGBoost + Graph Analytics.
-            Free to use. No sign-up required.
+            Self-host 100% free or use our Cloud API.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <a href="#demo"
+            <Link href="/auth/signup"
               className="btn-primary text-base py-3 px-8 glow-blue inline-flex items-center gap-2">
+              Get Free API Key <ArrowRight className="w-5 h-5" />
+            </Link>
+            <a href="#demo"
+              className="btn-secondary text-base py-3 px-8 inline-flex items-center gap-2">
               <Zap className="w-5 h-5" /> Try Live Demo
             </a>
             <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
               target="_blank" rel="noopener noreferrer"
               className="btn-secondary text-base py-3 px-8">
-              ⭐ Star on GitHub
+              ⭐ GitHub
             </a>
           </div>
 
@@ -662,6 +666,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-slate-400">
+            <Link href="/auth/signup" className="hover:text-white transition-colors">Get API Key</Link>
             <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
               target="_blank" rel="noopener noreferrer"
               className="hover:text-white transition-colors">⭐ GitHub</a>
