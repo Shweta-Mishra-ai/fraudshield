@@ -101,7 +101,7 @@ export default function DashboardPage() {
         }
       ])
     } else {
-      const { data: keys } = await getApiKeys(u.id)
+      const { data: keys } = await getApiKeys((u as any)?.id || 'demo_user')
       setApiKeys(keys || [])
     }
 
