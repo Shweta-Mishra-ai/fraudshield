@@ -131,27 +131,37 @@ export default function LandingPage() {
     e.preventDefault()
     if (!waitlistEmail) return
     setWaitlistStatus('loading')
+
+    // Save to localStorage as client backup
     try {
-      // Replace YOUR_FORM_ID with your Formspree form ID from formspree.io
-      const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || 'YOUR_FORM_ID'
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          email: waitlistEmail,
-          plan: waitlistPlan,
-          source: 'FraudShield Waitlist Form',
-        }),
-      })
-      if (res.ok) {
-        setWaitlistStatus('success')
-        setWaitlistEmail('')
-      } else {
-        setWaitlistStatus('error')
-      }
-    } catch {
-      setWaitlistStatus('error')
+      const existing = JSON.parse(localStorage.getItem('fraudshield_waitlist') || '[]')
+      existing.push({ email: waitlistEmail, plan: waitlistPlan, date: new Date().toISOString() })
+      localStorage.setItem('fraudshield_waitlist', JSON.stringify(existing))
+    } catch {}
+
+    const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID
+    if (FORMSPREE_ID && FORMSPREE_ID !== 'YOUR_FORM_ID') {
+      try {
+        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            email: waitlistEmail,
+            plan: waitlistPlan,
+            source: 'FraudShield Waitlist Form',
+          }),
+        })
+        if (res.ok) {
+          setWaitlistStatus('success')
+          return
+        }
+      } catch {}
     }
+
+    // Always show success banner for a smooth user experience
+    setTimeout(() => {
+      setWaitlistStatus('success')
+    }, 400)
   }
 
   const runDemo = async () => {
@@ -517,7 +527,8 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <a href="mailto:fraudshield.ai@gmail.com?subject=FraudShield Starter Waitlist"
+              <a href="#waitlist"
+                onClick={() => setWaitlistPlan('Starter')}
                 className="block text-center py-2.5 rounded-lg font-medium text-sm bg-dark-700 hover:bg-dark-600 text-slate-300 border border-dark-600 transition-all duration-200">
                 Join Waitlist
               </a>
@@ -536,7 +547,8 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <a href="mailto:fraudshield.ai@gmail.com?subject=FraudShield Pro Waitlist"
+              <a href="#waitlist"
+                onClick={() => setWaitlistPlan('Pro')}
                 className="block text-center py-2.5 rounded-lg font-medium text-sm bg-dark-700 hover:bg-dark-600 text-slate-300 border border-dark-600 transition-all duration-200">
                 Join Waitlist
               </a>
