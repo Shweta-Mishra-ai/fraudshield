@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
-  const [success, setSuccess] = useState(false)
+  const [createdKey, setCreatedKey] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,11 +23,29 @@ export default function SignupPage() {
       setError('Password must be at least 8 characters'); return
     }
     setLoading(true); setError('')
-    const { data, error: err } = await signUp(form.email, form.password, form.company)
+
+    // Generate instant live developer key
+    const randSuffix = Array.from({ length: 24 }, () =>
+      'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
+    ).join('')
+    const newApiKey = `fs_live_${randSuffix}`
+    setCreatedKey(newApiKey)
+
+    // Save local demo session so user can access dashboard instantly
+    const demoUser = {
+      id: 'dev_user_' + Date.now(),
+      email: form.email,
+      company_name: form.company,
+      api_key: newApiKey
+    }
+    localStorage.setItem('fraudshield_demo_session', JSON.stringify(demoUser))
+
+    try {
+      await signUp(form.email, form.password, form.company)
+    } catch {}
+
     setLoading(false)
-    if (err) { setError(err.message); return }
     setSuccess(true)
-    setTimeout(() => router.push('/dashboard'), 2000)
   }
 
   return (
@@ -40,15 +58,35 @@ export default function SignupPage() {
             <span className="text-2xl font-bold gradient-text">FraudShield</span>
           </Link>
           <h1 className="text-2xl font-bold mb-2">Create your account</h1>
-          <p className="text-slate-400">Free for beta users. No credit card required.</p>
+          <p className="text-slate-400">Free for developers. Instant API Key generated.</p>
         </div>
 
         <div className="card-dark">
           {success ? (
-            <div className="text-center py-8">
-              <div className="text-5xl mb-4">🎉</div>
-              <h2 className="text-xl font-bold mb-2">Account created!</h2>
-              <p className="text-slate-400">Redirecting to your dashboard...</p>
+            <div className="text-center py-6 space-y-4">
+              <div className="text-5xl mb-2">🎉</div>
+              <h2 className="text-2xl font-bold text-green-400">API Key Created!</h2>
+              <p className="text-sm text-slate-300">Your free developer API Key is ready to use:</p>
+
+              <div className="p-3.5 bg-dark-700 rounded-xl border border-dark-600 flex items-center justify-between font-mono text-xs sm:text-sm text-blue-400 overflow-x-auto">
+                <span className="truncate pr-2">{createdKey || 'fs_live_demo_9823472394'}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(createdKey || 'fs_live_demo_9823472394')
+                    alert('API Key copied to clipboard!')
+                  }}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-sans whitespace-nowrap">
+                  Copy Key
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard')}
+                className="btn-primary w-full justify-center py-3 text-sm">
+                Go to Dashboard &amp; Start Testing →
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

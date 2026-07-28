@@ -365,69 +365,67 @@ export default function LandingPage() {
 
               {demoResult && (
                 <div className="space-y-4 animate-fade-in">
-                  {/* Decision badge */}
-                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border
-                    font-bold text-lg ${decisionBg(demoResult.decision)}`}>
-                    <span className={decisionColor(demoResult.decision)}>
-                      {demoResult.decision === 'ALLOW' ? '✅' :
-                       demoResult.decision === 'BLOCK' ? '🚫' : '⚠️'}
-                    </span>
-                    <span className={decisionColor(demoResult.decision)}>
-                      {demoResult.decision}
-                    </span>
-                  </div>
-
-                  {/* Score */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { label: 'Risk Score', value: demoResult.score?.toFixed(3) },
-                      { label: 'Risk Level', value: demoResult.risk_level },
-                      { label: 'Latency',    value: `${demoResult.latency_ms}ms` },
-                    ].map((m, i) => (
-                      <div key={i} className="bg-dark-700 rounded-lg p-3 text-center">
-                        <div className="text-xs text-slate-400 mb-1">{m.label}</div>
-                        <div className="font-semibold text-sm">{m.value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Model scores */}
-                  {demoResult.scores && (
-                    <div className="space-y-2">
-                      <p className="text-xs text-slate-400 uppercase tracking-wider">
-                        Ensemble breakdown
-                      </p>
-                      {[
-                        { label: 'Rule Engine (40%)', val: demoResult.scores.rule },
-                        { label: 'ML Model (45%)',    val: demoResult.scores.ml },
-                        { label: 'Graph (15%)',       val: demoResult.scores.graph },
-                      ].map((s, i) => (
-                        <div key={i}>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-slate-400">{s.label}</span>
-                            <span>{(s.val * 100).toFixed(0)}%</span>
-                          </div>
-                          <div className="h-1.5 bg-dark-600 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                              style={{ width: `${(s.val || 0) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                  {/* Decision badge & Plain English Status */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-dark-700/80 border border-dark-600">
+                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-bold text-lg ${decisionBg(demoResult.decision)}`}>
+                      <span className={decisionColor(demoResult.decision)}>
+                        {demoResult.decision === 'ALLOW' ? '🟢 SAFE' :
+                         demoResult.decision === 'BLOCK' ? '🔴 HIGH FRAUD RISK' : '🟡 SUSPICIOUS'}
+                      </span>
                     </div>
-                  )}
+                    <div className="text-xs text-slate-400 font-mono">
+                      ⚡ Evaluated in <span className="text-green-400 font-bold">{demoResult.latency_ms}ms</span>
+                    </div>
+                  </div>
 
-                  {/* Reasons */}
+                  {/* Non-tech plain English summary banner */}
+                  <div className={`p-3.5 rounded-xl border text-sm ${
+                    demoResult.decision === 'ALLOW' ? 'bg-green-500/10 border-green-500/20 text-green-300' :
+                    demoResult.decision === 'BLOCK' ? 'bg-red-500/10 border-red-500/20 text-red-300' :
+                    'bg-yellow-500/10 border-yellow-500/20 text-yellow-300'
+                  }`}>
+                    <div className="font-semibold mb-1 flex items-center gap-1.5">
+                      {demoResult.decision === 'ALLOW' ? '✅ Action: Process Payment' :
+                       demoResult.decision === 'BLOCK' ? '⛔ Action: Block Payment & Alert User' :
+                       '🔍 Action: Send to Analyst Review'}
+                    </div>
+                    <p className="text-xs opacity-90 leading-relaxed">
+                      {demoResult.decision === 'ALLOW' && 'All security checks passed. Transaction behavior matches normal spending patterns.'}
+                      {demoResult.decision === 'BLOCK' && 'Multiple critical fraud indicators detected (high risk location, abnormal amount, or suspicious device). Payment blocked to prevent financial loss.'}
+                      {demoResult.decision === 'REVIEW' && 'Transaction shows unusual pattern. Temporarily held for manual review by your fraud team.'}
+                    </p>
+                  </div>
+
+                  {/* Visual Risk Gauge Meter */}
+                  <div className="bg-dark-700/60 rounded-xl p-3.5 border border-dark-600">
+                    <div className="flex justify-between items-center text-xs mb-2">
+                      <span className="text-slate-400 font-medium">Risk Score Meter:</span>
+                      <span className={`font-bold text-sm ${decisionColor(demoResult.decision)}`}>
+                        {((demoResult.score || 0) * 100).toFixed(0)}% Risk ({demoResult.risk_level})
+                      </span>
+                    </div>
+                    <div className="h-3 bg-dark-800 rounded-full overflow-hidden p-0.5 border border-dark-600">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${
+                          (demoResult.score || 0) > 0.7 ? 'bg-gradient-to-r from-yellow-500 to-red-500' :
+                          (demoResult.score || 0) > 0.4 ? 'bg-gradient-to-r from-green-500 to-yellow-500' :
+                          'bg-green-500'
+                        }`}
+                        style={{ width: `${Math.max(5, (demoResult.score || 0) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Triggered Reasons in simple terms */}
                   {demoResult.reasons?.length > 0 && (
-                    <div className="space-y-1">
-                      <p className="text-xs text-slate-400 uppercase tracking-wider">
-                        Triggered rules
+                    <div className="space-y-1.5 bg-dark-700/40 p-3.5 rounded-xl border border-dark-600">
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Why was this flagged?
                       </p>
                       {demoResult.reasons.map((r: string, i: number) => (
-                        <div key={i} className="flex items-start gap-2 text-sm">
+                        <div key={i} className="flex items-start gap-2 text-xs text-slate-300">
                           <AlertTriangle className="w-3.5 h-3.5 text-yellow-400 mt-0.5 flex-shrink-0" />
-                          <span className="text-slate-300">{r}</span>
+                          <span>{r}</span>
                         </div>
                       ))}
                     </div>
