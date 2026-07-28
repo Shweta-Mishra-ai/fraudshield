@@ -59,6 +59,13 @@ Designed to evaluate credit card and digital transaction streams with **sub-mill
 
 ---
 
+### 🎬 Live Demo Preview
+![FraudShield Live Demo](docs/assets/demo.jpg)
+
+> ⚡ **[Try the live demo →](https://fraudshield-blue-seven.vercel.app/)** · **[Streamlit Dashboard →](https://realtime-fraud-pathway-yk6vymdmgdfsue6lbappytf.streamlit.app/)** · **[API Docs →](https://fraudshield-hmas.onrender.com/docs)**
+
+---
+
 ### 🔄 End-to-End Real-Time Streaming Sequence
 
 ```mermaid
