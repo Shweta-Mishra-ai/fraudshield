@@ -176,6 +176,7 @@ export default function LandingPage() {
               <a href="#features" className="hover:text-white transition-colors">Features</a>
               <a href="#demo"     className="hover:text-white transition-colors">Live Demo</a>
               <a href="#how"      className="hover:text-white transition-colors">How it works</a>
+              <a href="#pricing"  className="hover:text-white transition-colors">Pricing</a>
             </div>
             <div className="flex items-center gap-3">
               <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
@@ -444,26 +445,89 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Open Source CTA ─────────────────────────────────────────────── */}
-      <section className="py-20 px-4 bg-dark-800/50">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            100% Free &amp; Open Source
-          </h2>
-          <p className="text-slate-400 mb-8">
-            No sign-up. No credit card. Deploy on your own infra or use the live demo.
-            MIT Licensed.
+      {/* ── Pricing ────────────────────────────────────────────────────── */}
+      <section id="pricing" className="py-20 px-4 bg-dark-800/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, transparent pricing</h2>
+            <p className="text-slate-400 text-lg">Start free. Scale when you're ready.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Free tier — live now */}
+            <div className="rounded-xl border p-6 border-brand-500 bg-brand-600/10 glow-blue">
+              <div className="badge-blue mb-3 inline-block">🟢 Live Now</div>
+              <h3 className="text-lg font-bold mb-1">Free</h3>
+              <div className="text-4xl font-bold mb-1">$0</div>
+              <div className="text-xs text-slate-400 mb-5">Forever free · Open source</div>
+              <ul className="space-y-2 mb-6">
+                {['Live fraud detection demo','Full ML ensemble (XGBoost + IsoForest)','9 fraud rules engine','Graph fraud ring detection','Streamlit analytics dashboard','FastAPI + Swagger docs','MIT License — self-host freely'].map((f,i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                    <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="#demo" className="block text-center py-2.5 rounded-lg font-medium text-sm bg-brand-600 hover:bg-brand-700 text-white transition-all duration-200">
+                Try Live Demo
+              </a>
+            </div>
+
+            {/* Starter — coming soon */}
+            <div className="rounded-xl border p-6 border-dark-600 bg-dark-800 relative">
+              <div className="absolute top-4 right-4 text-xs bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full">Coming Soon</div>
+              <h3 className="text-lg font-bold mb-1">Starter</h3>
+              <div className="text-4xl font-bold mb-1">$29</div>
+              <div className="text-xs text-slate-400 mb-5">/month</div>
+              <ul className="space-y-2 mb-6">
+                {['Everything in Free','50,000 transactions/month','Managed cloud hosting','Webhook fraud alerts','Priority email support','Usage analytics dashboard','No self-hosting needed'].map((f,i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                    <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="mailto:fraudshield.ai@gmail.com?subject=FraudShield Starter Waitlist"
+                className="block text-center py-2.5 rounded-lg font-medium text-sm bg-dark-700 hover:bg-dark-600 text-slate-300 border border-dark-600 transition-all duration-200">
+                Join Waitlist
+              </a>
+            </div>
+
+            {/* Pro — coming soon */}
+            <div className="rounded-xl border p-6 border-dark-600 bg-dark-800 relative">
+              <div className="absolute top-4 right-4 text-xs bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded-full">Coming Soon</div>
+              <h3 className="text-lg font-bold mb-1">Pro</h3>
+              <div className="text-4xl font-bold mb-1">$99</div>
+              <div className="text-xs text-slate-400 mb-5">/month</div>
+              <ul className="space-y-2 mb-6">
+                {['Everything in Starter','500,000 transactions/month','Custom fraud rules builder','Dedicated support & SLA','White-label option','Team access (5 seats)','GDPR compliance tools'].map((f,i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-slate-300">
+                    <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="mailto:fraudshield.ai@gmail.com?subject=FraudShield Pro Waitlist"
+                className="block text-center py-2.5 rounded-lg font-medium text-sm bg-dark-700 hover:bg-dark-600 text-slate-300 border border-dark-600 transition-all duration-200">
+                Join Waitlist
+              </a>
+            </div>
+          </div>
+
+          <p className="text-center text-slate-500 text-sm mt-8">
+            💡 Paid plans coming soon. Join the waitlist to get early access &amp; 3 months free.
           </p>
+        </div>
+      </section>
+
+      {/* ── Final CTA ───────────────────────────────────────────────────── */}
+      <section className="py-20 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Start detecting fraud today</h2>
+          <p className="text-slate-400 mb-8">Free forever. No credit card. Production-ready in minutes.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#demo"
-              className="btn-primary text-base py-3 px-8 glow-blue inline-flex items-center gap-2">
+            <a href="#demo" className="btn-primary text-base py-3 px-8 glow-blue inline-flex items-center gap-2">
               <Zap className="w-5 h-5" /> Try Live Demo
             </a>
-            <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
-              target="_blank" rel="noopener noreferrer"
-              className="btn-secondary text-base py-3 px-8">
-              ⭐ Star on GitHub
-            </a>
+            <a href="https://github.com/Shweta-Mishra-ai/fraudshield" target="_blank" rel="noopener noreferrer"
+              className="btn-secondary text-base py-3 px-8">⭐ Star on GitHub</a>
           </div>
         </div>
       </section>
