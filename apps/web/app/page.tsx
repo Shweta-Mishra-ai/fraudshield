@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import {
   Shield, Zap, Brain, GitBranch, Lock, BarChart3,
@@ -121,6 +121,38 @@ export default function LandingPage() {
   const [demoResult, setDemoResult]   = useState<any>(null)
   const [demoError, setDemoError]     = useState('')
   const [selectedPreset, setSelectedPreset] = useState(0)
+
+  // ── Waitlist form state ───────────────────────────────────────────────
+  const [waitlistEmail, setWaitlistEmail] = useState('')
+  const [waitlistPlan,  setWaitlistPlan]  = useState('Starter')
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle'|'loading'|'success'|'error'>('idle')
+
+  const submitWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!waitlistEmail) return
+    setWaitlistStatus('loading')
+    try {
+      // Replace YOUR_FORM_ID with your Formspree form ID from formspree.io
+      const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || 'YOUR_FORM_ID'
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          email: waitlistEmail,
+          plan: waitlistPlan,
+          source: 'FraudShield Waitlist Form',
+        }),
+      })
+      if (res.ok) {
+        setWaitlistStatus('success')
+        setWaitlistEmail('')
+      } else {
+        setWaitlistStatus('error')
+      }
+    } catch {
+      setWaitlistStatus('error')
+    }
+  }
 
   const runDemo = async () => {
     setDemoLoading(true)
@@ -450,7 +482,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, transparent pricing</h2>
-            <p className="text-slate-400 text-lg">Start free. Scale when you're ready.</p>
+            <p className="text-slate-400 text-lg">Start free. Scale when you&apos;re ready.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -532,12 +564,88 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Waitlist / Lead Collection ───────────────────────────────── */}
+      <section id="waitlist" className="py-20 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full
+            bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm mb-6">
+            <Zap className="w-3.5 h-3.5" />
+            Early Access · 3 Months Free for First 50 Users
+          </div>
 
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Get early access to paid plans
+          </h2>
+          <p className="text-slate-400 mb-8">
+            Join the waitlist. We’ll email you when $29 Starter &amp; $99 Pro launch.
+            First 50 users get <span className="text-purple-400 font-semibold">3 months free</span>.
+          </p>
+
+          {waitlistStatus === 'success' ? (
+            <div className="card-dark border-green-500/30 bg-green-500/5 py-10">
+              <div className="text-4xl mb-3">🎉</div>
+              <h3 className="text-xl font-bold text-green-400 mb-2">You’re on the list!</h3>
+              <p className="text-slate-400">We’ll email you at <span className="text-white font-medium">{waitlistEmail || 'your email'}</span> when we launch.</p>
+            </div>
+          ) : (
+            <form onSubmit={submitWaitlist} className="flex flex-col gap-4">
+              {/* Plan selector */}
+              <div className="flex items-center justify-center gap-3">
+                {['Starter ($29/mo)', 'Pro ($99/mo)'].map((plan, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setWaitlistPlan(i === 0 ? 'Starter' : 'Pro')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                      (i === 0 ? 'Starter' : 'Pro') === waitlistPlan
+                        ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                        : 'border-dark-600 bg-dark-700 text-slate-400 hover:border-slate-500'
+                    }`}>
+                    {plan}
+                  </button>
+                ))}
+              </div>
+
+              {/* Email input + submit */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={e => setWaitlistEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 px-4 py-3 rounded-xl bg-dark-800 border border-dark-600
+                    text-white placeholder-slate-500 focus:outline-none focus:border-purple-500
+                    transition-colors text-sm"
+                />
+                <button
+                  type="submit"
+                  disabled={waitlistStatus === 'loading'}
+                  className="px-6 py-3 rounded-xl font-semibold text-sm bg-purple-600
+                    hover:bg-purple-700 text-white transition-all duration-200 glow-blue
+                    disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap">
+                  {waitlistStatus === 'loading' ? '⏳ Joining...' : 'Join Waitlist →'}
+                </button>
+              </div>
+
+              {waitlistStatus === 'error' && (
+                <p className="text-red-400 text-sm">
+                  Something went wrong. Email us directly at{' '}
+                  <a href="mailto:fraudshield.ai@gmail.com" className="underline">fraudshield.ai@gmail.com</a>
+                </p>
+              )}
+
+              <p className="text-slate-500 text-xs">
+                🔒 No spam. Unsubscribe anytime. We only email when we launch.
+              </p>
+            </form>
+          )}
+        </div>
+      </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <footer className="border-t border-dark-600 py-8 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row
-          items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-blue-400" />
             <span className="font-semibold">FraudShield</span>
