@@ -132,36 +132,32 @@ export default function LandingPage() {
     if (!waitlistEmail) return
     setWaitlistStatus('loading')
 
-    // Save to localStorage as client backup
+    // 1. Save to client localStorage backup
     try {
       const existing = JSON.parse(localStorage.getItem('fraudshield_waitlist') || '[]')
       existing.push({ email: waitlistEmail, plan: waitlistPlan, date: new Date().toISOString() })
       localStorage.setItem('fraudshield_waitlist', JSON.stringify(existing))
     } catch {}
 
+    // 2. Post to Formspree in background if ID is configured
     const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID
     if (FORMSPREE_ID && FORMSPREE_ID !== 'YOUR_FORM_ID') {
       try {
-        const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({
             email: waitlistEmail,
+            _replyto: waitlistEmail,
+            message: `FraudShield Waitlist Registration for ${waitlistPlan} plan`,
             plan: waitlistPlan,
-            source: 'FraudShield Waitlist Form',
           }),
         })
-        if (res.ok) {
-          setWaitlistStatus('success')
-          return
-        }
       } catch {}
     }
 
-    // Always show success banner for a smooth user experience
-    setTimeout(() => {
-      setWaitlistStatus('success')
-    }, 400)
+    // 3. Always show success message to user
+    setWaitlistStatus('success')
   }
 
   const runDemo = async () => {
