@@ -176,17 +176,17 @@ export default function LandingPage() {
               <a href="#features" className="hover:text-white transition-colors">Features</a>
               <a href="#demo"     className="hover:text-white transition-colors">Live Demo</a>
               <a href="#how"      className="hover:text-white transition-colors">How it works</a>
-              <a href="#pricing"  className="hover:text-white transition-colors">Pricing</a>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/auth/login"
+              <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
+                target="_blank" rel="noopener noreferrer"
                 className="text-sm text-slate-400 hover:text-white transition-colors">
-                Sign in
-              </Link>
-              <Link href="/auth/signup"
+                ⭐ GitHub
+              </a>
+              <a href="#demo"
                 className="btn-primary text-sm py-2 px-4">
-                Get API Key <ChevronRight className="w-4 h-4" />
-              </Link>
+                Try Demo <ChevronRight className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full
             bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm mb-6">
             <Zap className="w-3.5 h-3.5" />
-            Now in beta — Free for first 100 users
+            Open Source · MIT License · 180 Tests Passing
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -207,19 +207,20 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            ML-powered fraud detection API for fintech, e-commerce, and payments.
+            Open-source fraud detection platform for fintech, e-commerce, and payments.
             3-layer ensemble: Rule Engine + XGBoost + Graph Analytics.
-            One API call. No setup required.
+            Free to use. No sign-up required.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <Link href="/auth/signup"
-              className="btn-primary text-base py-3 px-8 glow-blue">
-              Get Free API Key <ArrowRight className="w-5 h-5" />
-            </Link>
             <a href="#demo"
+              className="btn-primary text-base py-3 px-8 glow-blue inline-flex items-center gap-2">
+              <Zap className="w-5 h-5" /> Try Live Demo
+            </a>
+            <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
+              target="_blank" rel="noopener noreferrer"
               className="btn-secondary text-base py-3 px-8">
-              Try Live Demo
+              ⭐ Star on GitHub
             </a>
           </div>
 
@@ -443,121 +444,31 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Pricing ────────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-20 px-4 bg-dark-800/50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              100% Free &amp; Open Source
-            </h2>
-            <p className="text-slate-400 text-lg">
-              No credit card. No sign-up required. Deploy it yourself.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name:  'Live Demo',
-                price: 'Free',
-                sub:   'Try it right now — no setup',
-                features: [
-                  'Live fraud detection demo',
-                  'Full ML ensemble scoring',
-                  'Graph fraud ring detection',
-                  'Streamlit analytics dashboard',
-                  'FastAPI Swagger docs',
-                ],
-                cta:   'Try Live Demo',
-                href:  '#demo',
-                highlight: true,
-              },
-              {
-                name:  'Self-Host',
-                price: 'Free',
-                sub:   'Deploy on your own infra',
-                features: [
-                  'Full source code on GitHub',
-                  'Docker + Render ready',
-                  'Unlimited transactions',
-                  'Custom rules & thresholds',
-                  'MIT License',
-                ],
-                cta:   'View on GitHub',
-                href:  'https://github.com/Shweta-Mishra-ai/fraudshield',
-                highlight: false,
-              },
-              {
-                name:  'Contribute',
-                price: 'Open',
-                sub:   'Source',
-                features: [
-                  'Fork & improve freely',
-                  '180 tests included',
-                  'CI/CD GitHub Actions',
-                  'Full documentation',
-                  'PRs welcome!',
-                ],
-                cta:   'Star on GitHub ⭐',
-                href:  'https://github.com/Shweta-Mishra-ai/fraudshield',
-                highlight: false,
-              },
-            ].map((plan, i) => (
-              <div key={i} className={`rounded-xl border p-6 ${
-                plan.highlight
-                  ? 'border-brand-500 bg-brand-600/10 glow-blue'
-                  : 'border-dark-600 bg-dark-800'
-              }`}>
-                {plan.highlight && (
-                  <div className="badge-blue mb-3 inline-block">📊 Live Now</div>
-                )}
-                <h3 className="text-lg font-bold mb-1">{plan.name}</h3>
-                <div className="text-3xl font-bold mb-1">{plan.price}</div>
-                <div className="text-xs text-slate-400 mb-5">{plan.sub}</div>
-
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2 text-sm text-slate-300">
-                      <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href={plan.href}
-                  className={`block text-center py-2.5 rounded-lg font-medium
-                    text-sm transition-all duration-200 ${
-                    plan.highlight
-                      ? 'bg-brand-600 hover:bg-brand-700 text-white'
-                      : 'bg-dark-700 hover:bg-dark-600 text-slate-300 border border-dark-600'
-                  }`}>
-                  {plan.cta}
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4">
+      {/* ── Open Source CTA ─────────────────────────────────────────────── */}
+      <section className="py-20 px-4 bg-dark-800/50">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Start detecting fraud today
+            100% Free &amp; Open Source
           </h2>
           <p className="text-slate-400 mb-8">
-            Free API key. No credit card. Production-ready in minutes.
+            No sign-up. No credit card. Deploy on your own infra or use the live demo.
+            MIT Licensed.
           </p>
-          <Link href="/auth/signup"
-            className="btn-primary text-base py-3 px-10 mx-auto glow-blue inline-flex">
-            Get Free API Key <ArrowRight className="w-5 h-5" />
-          </Link>
-          <p className="mt-4 text-xs text-slate-500">
-            {'{'}spots remaining for beta users: 100{'}'}
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="#demo"
+              className="btn-primary text-base py-3 px-8 glow-blue inline-flex items-center gap-2">
+              <Zap className="w-5 h-5" /> Try Live Demo
+            </a>
+            <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
+              target="_blank" rel="noopener noreferrer"
+              className="btn-secondary text-base py-3 px-8">
+              ⭐ Star on GitHub
+            </a>
+          </div>
         </div>
       </section>
+
+
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <footer className="border-t border-dark-600 py-8 px-4">
@@ -567,17 +478,21 @@ export default function LandingPage() {
             <Shield className="w-5 h-5 text-blue-400" />
             <span className="font-semibold">FraudShield</span>
             <span className="text-slate-500 text-sm">
-              — Real-time fraud detection API
+              — Open-source real-time fraud detection
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-slate-400">
-            <Link href="/auth/login"  className="hover:text-white transition-colors">Login</Link>
-            <Link href="/auth/signup" className="hover:text-white transition-colors">Sign Up</Link>
+            <a href="https://github.com/Shweta-Mishra-ai/fraudshield"
+              target="_blank" rel="noopener noreferrer"
+              className="hover:text-white transition-colors">⭐ GitHub</a>
+            <a href="https://fraudshield-hmas.onrender.com/docs"
+              target="_blank" rel="noopener noreferrer"
+              className="hover:text-white transition-colors">API Docs</a>
             <a href="mailto:fraudshield.ai@gmail.com"
               className="hover:text-white transition-colors">Contact</a>
           </div>
           <div className="text-xs text-slate-500">
-            © 2024 FraudShield. Built by{' '}
+            © 2026 FraudShield. Built by{' '}
             <a href="https://www.linkedin.com/in/shweta-mishra-ai"
               className="text-blue-400 hover:underline">Shweta Mishra</a>
           </div>
