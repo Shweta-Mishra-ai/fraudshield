@@ -72,8 +72,8 @@ export default function DashboardPage() {
       u = {
         id: 'dev_guest_' + Date.now(),
         email: 'developer@fraudshield.io',
-        company_name: 'Developer Sandbox'
-      }
+        user_metadata: { company_name: 'Developer Sandbox' }
+      } as any
       localStorage.setItem('fraudshield_demo_session', JSON.stringify(u))
       isDemoMode = true
     }
