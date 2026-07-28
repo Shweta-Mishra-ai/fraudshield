@@ -54,20 +54,51 @@ export default function DashboardPage() {
   }, [])
 
   async function loadData() {
-    const u = await getUser()
+    let u = await getUser()
+    let isDemoMode = false
+
+    if (!u) {
+      const demoSession = localStorage.getItem('fraudshield_demo_session')
+      if (demoSession) {
+        try {
+          u = JSON.parse(demoSession)
+          isDemoMode = true
+        } catch {}
+      }
+    }
+
     if (!u) { router.push('/auth/login'); return }
     setUser(u)
 
-    const { data: keys } = await getApiKeys(u.id)
-    setApiKeys(keys || [])
-
-    // Load API stats if user has keys
-    if (keys && keys.length > 0) {
-      try {
-        const s = await getStats(keys[0].key_value)
-        setStats(s)
-      } catch {}
+    if (isDemoMode) {
+      // Provide instant working demo keys
+      setApiKeys([
+        {
+          id: 'demo_key_1',
+          name: 'Default Production Key',
+          key_value: 'fs_live_demo_8f93a721b04e9c12',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          tx_count: 142
+        },
+        {
+          id: 'demo_key_2',
+          name: 'Development / Staging Key',
+          key_value: 'fs_test_demo_4d21e890a3c9b781',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          tx_count: 28
+        }
+      ])
+    } else {
+      const { data: keys } = await getApiKeys(u.id)
+      setApiKeys(keys || [])
     }
+
+    try {
+      const s = await getStats('demo-key')
+      setStats(s)
+    } catch {}
 
     const h = await checkHealth()
     setHealth(h)

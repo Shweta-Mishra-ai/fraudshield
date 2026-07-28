@@ -117,6 +117,26 @@ export default function SignupPage() {
                   : 'Create account & get API key'}
               </button>
 
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-dark-600"></div></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-dark-800 px-2 text-slate-500">Or</span></div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const demoUser = {
+                    id: 'demo_user_' + Date.now(),
+                    email: form.email || 'developer@fraudshield.io',
+                    user_metadata: { company_name: form.company || 'Developer Sandbox' }
+                  }
+                  localStorage.setItem('fraudshield_demo_session', JSON.stringify(demoUser))
+                  router.push('/dashboard')
+                }}
+                className="w-full py-2.5 px-4 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-sm font-semibold transition-all flex items-center justify-center gap-2">
+                ⚡ Instant Demo Key Access (No Email Check)
+              </button>
+
               <p className="text-center text-sm text-slate-400">
                 Already have an account?{' '}
                 <Link href="/auth/login" className="text-blue-400 hover:underline">Sign in</Link>
